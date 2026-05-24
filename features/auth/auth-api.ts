@@ -76,6 +76,31 @@ export async function logoutUser(): Promise<void> {
   await api.post('/auth/logout');
 }
 
+/**
+ * Exchange a refresh token for a new access + refresh pair.
+ *
+ * Backend rotates the refresh token on every call (issues a new jti, deletes
+ * the old from Redis) so the returned refreshToken MUST replace the stored
+ * one or the next refresh will 401.
+ *
+ * Called from the axios response interceptor on 401. The `_skipAuthRetry`
+ * flag on this request's config tells the interceptor "don't try to refresh
+ * me if I 401" — otherwise a dead refresh token would loop back into the
+ * same code path.
+ */
+export async function refreshAccessToken(refreshToken: string): Promise<AuthResponse> {
+  if (useDevStub) {
+    await delay(200);
+    return mockAuthResponse('nathan@example.com');
+  }
+  const res = await api.post<AuthResponse>(
+    '/auth/refresh-access-token',
+    { refreshToken },
+    { _skipAuthRetry: true } as never,
+  );
+  return res.data;
+}
+
 export async function requestPasswordReset(
   data: ForgotPasswordRequest
 ): Promise<{ ok: true }> {

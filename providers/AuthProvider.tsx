@@ -7,7 +7,9 @@ import React, {
   useState,
 } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
 import { secureStorage } from '@/services/secureStorage';
+import { subscribeSessionInvalidated } from '@/services/sessionEvents';
 import { getMe } from '@/features/auth/auth-api';
 import type { AuthResponse, AuthUser } from '@/features/auth/auth.types';
 
@@ -44,22 +46,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ]);
         if (cancelled) return;
         setHasOnboarded(onboarded);
-        if (session) {
-          // Hydrate the user profile so screens like Profile can render
-          // immediately on cold launch. If the call fails (network, expired
-          // token), we still surface the app shell as authenticated — the
-          // next API call will trigger a 401 and the interceptor will clear
-          // the session.
-          setStatus('authenticated');
-          try {
-            const me = await getMe();
-            if (!cancelled) setUser(me);
-          } catch {
-            // Silent: keep status='authenticated' so the user sees the app;
-            // missing user data shows as a loading state in Profile.
-          }
-        } else {
+        if (!session) {
           setStatus('unauthenticated');
+          return;
+        }
+
+        // Validate the stored session up front. The axios interceptor will
+        // transparently refresh on 401, so any error reaching here means
+        // even refresh failed — the session is unrecoverable.
+        try {
+          const me = await getMe();
+          if (cancelled) return;
+          setUser(me);
+          setStatus('authenticated');
+        } catch (err) {
+          if (cancelled) return;
+          if (isAxiosError(err) && err.response?.status === 401) {
+            // Interceptor already cleared secure storage and emitted the
+            // invalidation event — we just mirror that into context state.
+            setUser(null);
+            setStatus('unauthenticated');
+          } else {
+            // Network / server hiccup: keep tokens, let the user into the
+            // shell, individual screens can surface their own loading errors.
+            setStatus('authenticated');
+          }
         }
       } catch {
         if (!cancelled) {
@@ -71,6 +82,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       cancelled = true;
     };
   }, []);
+
+  // Listen for "your session just died" pings from the axios interceptor.
+  // The interceptor clears secure storage on its own; our job is to mirror
+  // that into React state so the auth-gated routes redirect.
+  useEffect(() => {
+    return subscribeSessionInvalidated(() => {
+      queryClient.clear();
+      setUser(null);
+      setStatus('unauthenticated');
+    });
+  }, [queryClient]);
 
   const signIn = useCallback(
     async (data: AuthResponse) => {
