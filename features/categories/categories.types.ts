@@ -8,3 +8,11 @@ export type Category = {
   createdAt?: string;
   updatedAt?: string;
 };
+
+export type CreateCategoryRequest = {
+  name: string;
+  icon?: string;
+  color?: string;
+};
+
+export type UpdateCategoryRequest = Partial<CreateCategoryRequest>;

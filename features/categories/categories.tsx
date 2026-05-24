@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Pressable,
   ScrollView,
@@ -14,39 +14,35 @@ import { ChevronLeft, Plus } from 'lucide-react-native';
 import { SettingsSection } from '@/components/SettingsSection';
 import { ListItem } from '@/components/ListItem';
 import { AmountChip } from '@/components/AmountChip';
+import { SwipeToDelete } from '@/components/SwipeToDelete';
 import { useTheme } from '@/hooks/useTheme';
-import { useToast } from '@/hooks/useToast';
 import { radii, spacing, typography } from '@/theme';
 
 import { listCategories } from './categories-api';
 import { categoriesQueryKeys } from './categories.queryKeys';
+import { useDeleteCategory } from './categories.mutations';
+import { AddCategorySheet } from './components/AddCategorySheet';
 import type { Category } from './categories.types';
 
 /**
  * Categories management screen. Lists default (system) categories and any
- * user-created custom categories. Add / edit / delete come in a follow-up;
- * for now this is read-only with a coming-soon toast for write actions so
- * the AddExpense sheet always has somewhere to send the user when picking
- * a category isn't possible.
+ * user-created custom ones. Tap + to open the AddCategorySheet. Custom rows
+ * swipe right to delete (with confirmation); default rows can't be removed.
  */
 export function Categories() {
   const theme = useTheme();
-  const toast = useToast();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const categoriesQ = useQuery({
     queryKey: categoriesQueryKeys.list(),
     queryFn: listCategories,
   });
 
+  const del = useDeleteCategory();
+
   const defaults = categoriesQ.data?.filter((c) => c.isDefault) ?? [];
   const customs = categoriesQ.data?.filter((c) => !c.isDefault) ?? [];
-
-  const comingSoon = () =>
-    toast('info', {
-      title: 'Coming soon',
-      description: 'Adding custom categories is on its way.',
-    });
 
   return (
     <View style={styles.root}>
@@ -62,7 +58,7 @@ export function Categories() {
           </Pressable>
           <Text style={styles.title}>Categories</Text>
           <Pressable
-            onPress={comingSoon}
+            onPress={() => setSheetOpen(true)}
             hitSlop={8}
             style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.7 }]}
             accessibilityLabel="Add category"
@@ -101,16 +97,23 @@ export function Categories() {
             <EmptyRow text="No custom categories yet. Tap + to add one." />
           ) : (
             customs.map((cat, i) => (
-              <CategoryRow
+              <SwipeToDelete
                 key={cat.id}
-                category={cat}
-                hideDivider={i === customs.length - 1}
-                onPress={comingSoon}
-              />
+                onDelete={() => del.mutate(cat.id)}
+                confirmTitle="Delete category?"
+                confirmDescription="Expenses tagged with it will keep their record but lose this label."
+              >
+                <CategoryRow
+                  category={cat}
+                  hideDivider={i === customs.length - 1}
+                />
+              </SwipeToDelete>
             ))
           )}
         </SettingsSection>
       </ScrollView>
+
+      <AddCategorySheet visible={sheetOpen} onClose={() => setSheetOpen(false)} />
     </View>
   );
 }

@@ -25,6 +25,7 @@ import { categoriesQueryKeys } from '@/features/categories/categories.queryKeys'
 
 import { listExpenses } from './expenses-api';
 import { expensesQueryKeys } from './expenses.queryKeys';
+import { useDeleteExpense } from './expenses.mutations';
 import { groupExpensesByDate } from './groupByDate';
 import type { Expense, ExpenseFilters } from './expenses.types';
 
@@ -99,6 +100,9 @@ export function Expenses() {
     setEditing(expense);
     setSheetOpen(true);
   };
+
+  const del = useDeleteExpense();
+  const onDeleteRow = (expense: Expense) => del.mutate(expense.id);
 
   return (
     <View style={styles.root}>
@@ -176,6 +180,7 @@ export function Expenses() {
                     key={expense.id}
                     expense={expense}
                     onPress={openEdit}
+                    onDelete={onDeleteRow}
                     hideDivider={i === group.items.length - 1}
                   />
                 ))}

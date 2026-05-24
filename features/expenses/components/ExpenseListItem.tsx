@@ -2,6 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { ListItem } from '@/components/ListItem';
 import { AmountChip } from '@/components/AmountChip';
+import { SwipeToDelete } from '@/components/SwipeToDelete';
 import { useTheme } from '@/hooks/useTheme';
 import { radii } from '@/theme';
 import { formatAmount } from '@/utils/formatAmount';
@@ -14,15 +15,18 @@ import type { Expense } from '../expenses.types';
 type Props = {
   expense: Expense;
   onPress: (expense: Expense) => void;
+  onDelete?: (expense: Expense) => void;
   hideDivider?: boolean;
 };
 
 /**
  * One expense row in the list. Reuses the global ListItem primitive so
  * spacing, dividers, and press behavior stay consistent with profile
- * settings, money sources, and recent activity rows.
+ * settings, money sources, and recent activity rows. When `onDelete` is
+ * provided, the row gets a swipe-right-to-delete gesture with an Alert
+ * confirmation before the mutation fires.
  */
-export function ExpenseListItem({ expense, onPress, hideDivider }: Props) {
+export function ExpenseListItem({ expense, onPress, onDelete, hideDivider }: Props) {
   const theme = useTheme();
   const Icon = getCategoryIcon(expense.category.name);
   const colorKey = getCategoryColorKey(expense.category.name);
@@ -35,7 +39,7 @@ export function ExpenseListItem({ expense, onPress, hideDivider }: Props) {
     .filter(Boolean)
     .join(' · ');
 
-  return (
+  const row = (
     <ListItem
       hideDivider={hideDivider}
       leading={
@@ -61,6 +65,18 @@ export function ExpenseListItem({ expense, onPress, hideDivider }: Props) {
       }
       onPress={() => onPress(expense)}
     />
+  );
+
+  if (!onDelete) return row;
+
+  return (
+    <SwipeToDelete
+      onDelete={() => onDelete(expense)}
+      confirmTitle="Delete expense?"
+      confirmDescription="This cannot be undone."
+    >
+      {row}
+    </SwipeToDelete>
   );
 }
 
