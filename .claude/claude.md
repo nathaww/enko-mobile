@@ -1,5 +1,9 @@
 # CLAUDE.md
 
+> 📖 **Comprehensive reference:** see [`.claude/PRINCIPLES.md`](./PRINCIPLES.md) for the exhaustive doc covering every convention — naming, API, React Query, theming, forms, copy, platform UI, auth, pitfalls. CLAUDE.md is the high-level summary loaded into every session; PRINCIPLES.md is the deep reference.
+>
+> 🪪 **Review:** invoke the `review` skill (`/review` or "review my changes") to check pending work against the principles doc. Skill lives at `.claude/skills/review/SKILL.md`.
+
 ## Project Overview
 
 This is a React Native app built with Expo, Expo Router, React Query, Axios, and a Context-based theme system (no Unistyles, no styled-components — see Styling section).
