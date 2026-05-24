@@ -1,0 +1,1222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Enko Mobile · Wireframes</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ──────────────────────────────────────────────────────────────
+     ENKO DESIGN SYSTEM v2
+     • One brand accent: Wise green #9FE870
+     • Both dark & light with equal polish
+     • Heavy Plus Jakarta 800 display, tabular-nums for money
+     • Category color dots only — no tab-wide tints
+     • 3D hero moments, line icons for inline (SVG inline)
+     • iOS flat tabbar / Android centered-FAB tabbar
+     ────────────────────────────────────────────────────────────── */
+  :root{
+    /* canvas */
+    --canvas:#0a0b0d;
+    --frame:#1c1f23;
+    --frame-edge:#2c3036;
+
+    /* dark mode tokens */
+    --d-surface:#0B0D10;
+    --d-surface-1:#15181C;
+    --d-surface-2:#1E2226;
+    --d-surface-3:#272C32;
+    --d-on-surface:#F2F5F9;
+    --d-on-surface-muted:#8A939F;
+    --d-on-surface-dim:#5A626C;
+    --d-outline:#2B3138;
+    --d-outline-soft:#222730;
+
+    /* light mode tokens — warm cream pairs with green */
+    --l-surface:#FAFBF6;
+    --l-surface-1:#F2F4ED;
+    --l-surface-2:#E9ECE2;
+    --l-surface-3:#DFE3D7;
+    --l-on-surface:#0B0E08;
+    --l-on-surface-muted:#5A6253;
+    --l-on-surface-dim:#959C8E;
+    --l-outline:#D6DACC;
+    --l-outline-soft:#E5E9DD;
+
+    /* brand (same for both modes; on-brand differs) */
+    --brand:#9FE870;
+    --brand-deep:#6FC93F;
+    --on-brand:#062A14;
+    --brand-soft-d:rgba(159,232,112,0.14);
+    --brand-soft-l:#E0F3CC;
+
+    /* pastel amount chips */
+    --chip-pos-d:#103B25; --chip-pos-d-on:#C8F0DA;
+    --chip-neg-d:#3F0F12; --chip-neg-d-on:#FFC9CB;
+    --chip-info-d:#1A2049; --chip-info-d-on:#B4BCFF;
+
+    --chip-pos-l:#D5F2DF; --chip-pos-l-on:#0A4422;
+    --chip-neg-l:#FCDCDE; --chip-neg-l-on:#5C0006;
+    --chip-info-l:#DCE0FF; --chip-info-l-on:#1C2273;
+
+    /* category accents (used ONLY for category dots/icons, not whole pages) */
+    --cat-food:#F0A23B;
+    --cat-transit:#5DA8FF;
+    --cat-shop:#C18AFF;
+    --cat-fun:#FF7B9D;
+    --cat-health:#71D9C8;
+    --cat-bills:#8A8FA8;
+    --cat-income:#9FE870;
+  }
+  *{box-sizing:border-box}
+  html,body{
+    margin:0;background:var(--canvas);color:#dde1e7;
+    font:14px/1.45 "Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,Inter,"Segoe UI",Roboto,sans-serif;
+    font-feature-settings:"ss01";
+    -webkit-font-smoothing:antialiased;
+  }
+  .num,.amt,.balance,.chip-amt{font-feature-settings:"tnum"; font-variant-numeric:tabular-nums}
+  .mono{font-family:"Geist Mono",ui-monospace,monospace;font-feature-settings:"ss01","cv02"}
+
+  /* PAGE LAYOUT */
+  header.page{padding:56px 36px 12px;max-width:1480px;margin:0 auto}
+  header.page .kicker{color:var(--brand);font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase}
+  header.page h1{font-size:44px;margin:6px 0 10px;letter-spacing:-0.035em;font-weight:800;color:#fff;line-height:1}
+  header.page p{color:#9aa3af;margin:0;font-size:15px;max-width:740px;line-height:1.55}
+
+  section.group{padding:32px 36px;max-width:1480px;margin:0 auto}
+  section.group > h2{font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#9ea7b3;margin:0 0 22px;font-weight:700;display:flex;align-items:center;gap:12px}
+  section.group > h2::before{content:"";display:block;width:28px;height:2px;background:var(--brand);border-radius:99px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:36px 28px;align-items:start}
+  .pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:18px;align-items:start}
+
+  /* phone */
+  .phone{background:var(--frame);border:1px solid var(--frame-edge);border-radius:56px;padding:9px;box-shadow:0 20px 50px rgba(0,0,0,.55);width:302px;margin:0 auto}
+  .phone .cap{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:14px;color:#a4adba;font-size:11px;letter-spacing:0.02em}
+  .phone .cap b{color:#d6dbe2;font-weight:600}
+  .phone .cap .dot{width:6px;height:6px;border-radius:99px;background:var(--brand)}
+  .phone .cap .dot.light{background:#e7eaee}
+
+  .screen{
+    width:284px;height:614px;
+    border-radius:46px;overflow:hidden;position:relative;display:flex;flex-direction:column;
+  }
+  /* DARK / LIGHT screen tokens applied via class */
+  .screen.dark{
+    background:var(--d-surface);color:var(--d-on-surface);
+    --surface:var(--d-surface); --surface-1:var(--d-surface-1); --surface-2:var(--d-surface-2); --surface-3:var(--d-surface-3);
+    --on:var(--d-on-surface); --on-muted:var(--d-on-surface-muted); --on-dim:var(--d-on-surface-dim);
+    --outline:var(--d-outline); --outline-soft:var(--d-outline-soft);
+    --brand-soft:var(--brand-soft-d);
+    --chip-pos:var(--chip-pos-d); --chip-pos-on:var(--chip-pos-d-on);
+    --chip-neg:var(--chip-neg-d); --chip-neg-on:var(--chip-neg-d-on);
+    --chip-info:var(--chip-info-d); --chip-info-on:var(--chip-info-d-on);
+  }
+  .screen.light{
+    background:var(--l-surface);color:var(--l-on-surface);
+    --surface:var(--l-surface); --surface-1:var(--l-surface-1); --surface-2:var(--l-surface-2); --surface-3:var(--l-surface-3);
+    --on:var(--l-on-surface); --on-muted:var(--l-on-surface-muted); --on-dim:var(--l-on-surface-dim);
+    --outline:var(--l-outline); --outline-soft:var(--l-outline-soft);
+    --brand-soft:var(--brand-soft-l);
+    --chip-pos:var(--chip-pos-l); --chip-pos-on:var(--chip-pos-l-on);
+    --chip-neg:var(--chip-neg-l); --chip-neg-on:var(--chip-neg-l-on);
+    --chip-info:var(--chip-info-l); --chip-info-on:var(--chip-info-l-on);
+  }
+
+  /* status bar */
+  .stat{height:36px;display:flex;justify-content:space-between;align-items:center;padding:8px 26px 0;font-size:11px;font-weight:700;letter-spacing:0.02em;color:var(--on);flex-shrink:0}
+  .stat .r{display:flex;gap:5px;align-items:center;font-size:10px;opacity:.85}
+
+  /* big squircle hero panel — AiWallet pattern */
+  .hero-panel{
+    background:var(--surface-1);
+    border-bottom-left-radius:36px;border-bottom-right-radius:36px;
+    padding:6px 22px 22px;
+    margin-bottom:18px;
+  }
+  /* alternative hero with brand wash */
+  .hero-panel.brand{
+    background:linear-gradient(180deg,var(--brand-soft) 0%, transparent 100%), var(--surface-1);
+  }
+
+  /* topbar inside hero */
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0 14px}
+  .topbar .who{display:flex;align-items:center;gap:10px}
+  .avatar{width:36px;height:36px;border-radius:14px;background:var(--surface-2);color:var(--on);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;letter-spacing:-0.02em}
+  .who .greet{font-size:11px;color:var(--on-muted);font-weight:500}
+  .who .name{font-size:14px;font-weight:700;color:var(--on);letter-spacing:-0.01em;line-height:1.1}
+
+  .icon-btn{
+    width:38px;height:38px;border-radius:14px;
+    background:var(--surface-2);color:var(--on);
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--outline-soft);
+  }
+  .icon-btn .dot{position:absolute;margin-top:-12px;margin-left:10px;width:7px;height:7px;border-radius:99px;background:var(--brand)}
+  .icon-row{display:flex;gap:8px;position:relative}
+
+  /* HUGE display title — the AiWallet feel */
+  .display-xl{
+    font-size:44px;font-weight:800;letter-spacing:-0.045em;line-height:1.02;color:var(--on);
+  }
+  .display-lg{font-size:34px;font-weight:800;letter-spacing:-0.04em;line-height:1.05;color:var(--on)}
+  .display-md{font-size:24px;font-weight:800;letter-spacing:-0.03em;line-height:1.1;color:var(--on)}
+  .label-up{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--on-muted)}
+
+  /* segmented pill */
+  .seg{display:flex;background:var(--surface-2);border-radius:14px;padding:4px;gap:2px}
+  .seg span{flex:1;text-align:center;padding:9px 0;border-radius:11px;color:var(--on-muted);font-weight:600;font-size:12px}
+  .seg span.on{background:var(--surface);color:var(--on);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+  .screen.light .seg span.on{box-shadow:0 1px 3px rgba(0,0,0,.06)}
+
+  /* body */
+  .body{padding:0 18px 86px;flex:1;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+
+  /* card */
+  .card{
+    background:var(--surface-1);
+    border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:8px;
+  }
+  .card.tight{padding:6px 14px}
+
+  /* big balance display */
+  .balance{font-size:40px;font-weight:800;letter-spacing:-0.045em;line-height:1;color:var(--on)}
+  .balance .cents{font-size:24px;color:var(--on-muted);font-weight:700}
+  .balance .cur{font-size:14px;color:var(--on-muted);font-weight:600;margin-right:4px;letter-spacing:0}
+
+  /* amount chip */
+  .chip-amt{
+    display:inline-flex;align-items:center;gap:4px;border-radius:99px;padding:6px 10px;
+    font-size:12px;font-weight:700;
+  }
+  .chip-amt.pos{background:var(--chip-pos);color:var(--chip-pos-on)}
+  .chip-amt.neg{background:var(--chip-neg);color:var(--chip-neg-on)}
+  .chip-amt.info{background:var(--chip-info);color:var(--chip-info-on)}
+  .chip-amt.brand{background:var(--brand);color:var(--on-brand)}
+
+  /* row */
+  .row{display:flex;align-items:center;gap:12px;padding:11px 0}
+  .row + .row{border-top:1px solid var(--outline-soft)}
+  .row .ic{
+    width:42px;height:42px;border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--surface-2);
+    flex-shrink:0;
+  }
+  .row .ic svg{width:20px;height:20px}
+  .row .meta{flex:1;min-width:0}
+  .row .meta b{display:block;font-weight:700;font-size:14px;color:var(--on);letter-spacing:-0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25}
+  .row .meta span{font-size:11px;color:var(--on-muted);font-weight:500}
+
+  /* category icon backgrounds — soft + 14% accent */
+  .ic.cat-food{background:color-mix(in oklab, var(--cat-food) 18%, var(--surface-2)); color:var(--cat-food)}
+  .ic.cat-transit{background:color-mix(in oklab, var(--cat-transit) 18%, var(--surface-2)); color:var(--cat-transit)}
+  .ic.cat-shop{background:color-mix(in oklab, var(--cat-shop) 18%, var(--surface-2)); color:var(--cat-shop)}
+  .ic.cat-fun{background:color-mix(in oklab, var(--cat-fun) 18%, var(--surface-2)); color:var(--cat-fun)}
+  .ic.cat-health{background:color-mix(in oklab, var(--cat-health) 18%, var(--surface-2)); color:var(--cat-health)}
+  .ic.cat-bills{background:color-mix(in oklab, var(--cat-bills) 18%, var(--surface-2)); color:var(--cat-bills)}
+  .ic.cat-income{background:color-mix(in oklab, var(--brand) 22%, var(--surface-2)); color:var(--brand)}
+
+  .section-h{display:flex;justify-content:space-between;align-items:center;padding:2px 4px 0}
+  .section-h .t{font-size:13px;font-weight:700;color:var(--on);letter-spacing:-0.01em}
+  .section-h .x{font-size:12px;color:var(--brand-deep);font-weight:700;letter-spacing:-0.01em}
+  .screen.dark .section-h .x{color:var(--brand)}
+
+  /* date group label */
+  .dgroup{font-size:11px;font-weight:600;color:var(--on-muted);text-transform:uppercase;letter-spacing:0.12em;padding:4px 4px 2px}
+
+  /* chips horizontal */
+  .chips{display:flex;gap:6px;overflow:hidden}
+  .chip{
+    flex-shrink:0;display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:8px 13px;
+    font-size:12px;font-weight:600;color:var(--on-muted);background:var(--surface-2);border:1px solid var(--outline-soft)
+  }
+  .chip.on{background:var(--on);color:var(--surface);border-color:transparent;font-weight:700}
+  .chip.brand{background:var(--brand-soft);color:var(--brand-deep);border-color:transparent;font-weight:700}
+  .screen.dark .chip.brand{color:var(--brand)}
+
+  /* tab bar — iOS flat */
+  .tabbar{
+    position:absolute;bottom:0;left:0;right:0;height:72px;
+    background:color-mix(in oklab, var(--surface) 88%, transparent);
+    backdrop-filter:blur(20px);
+    border-top:1px solid var(--outline-soft);
+    display:flex;align-items:flex-start;justify-content:space-around;padding:10px 8px 18px;
+  }
+  .tabbar .tab{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--on-dim);flex:1;padding-top:2px}
+  .tabbar .tab svg{width:22px;height:22px}
+  .tabbar .tab.active{color:var(--on)}
+  .tabbar .tab.active .indicator{
+    position:absolute;margin-top:-2px;width:5px;height:5px;border-radius:99px;background:var(--brand);
+  }
+
+  /* tab bar — Android FAB pattern */
+  .tabbar.android{padding:10px 8px 16px;height:78px;align-items:center}
+  .tabbar.android .fab-slot{
+    width:60px;height:60px;border-radius:22px;background:var(--brand);color:var(--on-brand);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 10px 24px color-mix(in oklab, var(--brand) 38%, transparent);
+    margin-top:-22px;
+    border:4px solid var(--surface);
+  }
+  .tabbar.android .fab-slot svg{width:26px;height:26px}
+
+  /* fab — iOS (only on certain screens, bottom-right) */
+  .fab{
+    position:absolute;bottom:90px;right:18px;
+    width:58px;height:58px;border-radius:22px;
+    background:var(--brand);color:var(--on-brand);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 12px 26px color-mix(in oklab, var(--brand) 40%, transparent);
+  }
+  .fab svg{width:26px;height:26px}
+
+  /* sheet */
+  .scrim{position:absolute;inset:0;background:color-mix(in oklab, #000 50%, transparent)}
+  .sheet{
+    position:absolute;left:0;right:0;bottom:0;
+    background:var(--surface-1);
+    border-top-left-radius:36px;border-top-right-radius:36px;
+    padding:12px 20px 28px;
+    box-shadow:0 -20px 50px rgba(0,0,0,.35);
+    display:flex;flex-direction:column;gap:14px;
+  }
+  .sheet .grabber{width:40px;height:5px;background:var(--outline);border-radius:99px;margin:4px auto 4px}
+
+  /* input */
+  .input{
+    border-radius:18px;padding:16px;font-size:14px;
+    background:var(--surface-2);color:var(--on);
+    display:flex;align-items:center;gap:10px;justify-content:space-between;
+    border:1px solid transparent;
+  }
+  .input .ph{color:var(--on-muted)}
+  .input.brand-bg{background:var(--brand-soft); color:var(--brand-deep)}
+  .screen.dark .input.brand-bg{color:var(--brand)}
+  .field label{display:block;font-size:11px;color:var(--on-muted);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px}
+
+  /* buttons */
+  .btn{
+    border-radius:99px;padding:17px 22px;text-align:center;font-size:14px;font-weight:700;letter-spacing:-0.005em;
+    background:var(--brand);color:var(--on-brand);
+    box-shadow:0 8px 18px color-mix(in oklab, var(--brand) 30%, transparent);
+  }
+  .btn.tonal{background:var(--surface-2);color:var(--on);box-shadow:none}
+  .btn.ghost{background:transparent;color:var(--on);border:1.5px solid var(--outline);box-shadow:none}
+
+  /* 3D hero placeholder — soft blobby gradient shape */
+  .hero3d{
+    width:100%;aspect-ratio:1.4/1;border-radius:32px;
+    background:
+      radial-gradient(120px 100px at 30% 35%, color-mix(in oklab, var(--brand) 75%, white) 0%, transparent 60%),
+      radial-gradient(80px 80px at 70% 65%, color-mix(in oklab, var(--brand) 90%, black 20%) 0%, transparent 60%),
+      radial-gradient(60px 60px at 80% 30%, color-mix(in oklab, var(--brand) 60%, white) 0%, transparent 60%),
+      var(--surface-1);
+    position:relative;overflow:hidden;
+  }
+  .hero3d.indigo{
+    background:
+      radial-gradient(160px 120px at 35% 35%, #5560FF 0%, transparent 60%),
+      radial-gradient(100px 100px at 70% 65%, #2A1B7E 0%, transparent 60%),
+      radial-gradient(80px 80px at 80% 25%, #8A95FF 0%, transparent 60%),
+      #0F0B3F;
+  }
+  .hero3d .label{position:absolute;bottom:10px;left:12px;font-size:9px;color:var(--on-dim);background:color-mix(in oklab, var(--surface) 70%, transparent);padding:3px 7px;border-radius:6px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase}
+
+  /* category dot */
+  .cdot{width:8px;height:8px;border-radius:99px;display:inline-block;flex-shrink:0}
+
+  /* spark / chart */
+  .spark{height:38px;display:block;width:100%}
+  .barline{height:42px;display:flex;align-items:flex-end;gap:4px}
+  .barline i{flex:1;background:var(--brand);border-radius:3px;opacity:.85}
+  .barline i:nth-child(odd){opacity:.45}
+
+  /* progress */
+  .progress{height:6px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+  .progress > i{display:block;height:100%;background:var(--brand);border-radius:99px}
+
+  /* dots */
+  .dots{display:flex;gap:6px;justify-content:center}
+  .dots i{width:6px;height:6px;border-radius:99px;background:var(--outline)}
+  .dots i.on{background:var(--brand);width:22px}
+
+  /* account big card */
+  .acct-card{
+    background:var(--surface-1);border-radius:24px;padding:18px;
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .acct-card.brand{background:var(--surface-1);position:relative;overflow:hidden}
+  .acct-card.brand::after{
+    content:"";position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;
+    background:radial-gradient(circle, var(--brand-soft) 0%, transparent 70%);
+  }
+
+  /* foundation swatches */
+  .foundation{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:24px}
+  .fcard{background:#15181c;border:1px solid #262b33;border-radius:22px;padding:18px}
+  .fcard h4{margin:0 0 14px;font-size:13px;color:#cfd6df;letter-spacing:0.02em;font-weight:700}
+  .fcard .sw{display:flex;align-items:center;gap:10px;font-size:12px;color:#9aa3af;margin-bottom:8px;font-weight:500}
+  .fcard .sw i{width:18px;height:18px;border-radius:6px;border:1px solid rgba(255,255,255,.06);flex-shrink:0}
+  .fcard .sw code{font-family:"Geist Mono",monospace;font-size:11px;color:#cfd6df;margin-left:auto;font-weight:600}
+
+  .type-row{display:flex;gap:14px;align-items:baseline;color:#dde1e7;margin-bottom:12px}
+  .type-row .lbl{font-size:11px;color:#9aa3af;width:70px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase}
+  .type-row .sample{flex:1}
+  .display-demo-xl{font-size:42px;font-weight:800;letter-spacing:-0.045em;line-height:1;color:#fff}
+  .display-demo-lg{font-size:28px;font-weight:800;letter-spacing:-0.04em;line-height:1.05;color:#fff}
+  .display-demo-md{font-size:20px;font-weight:800;letter-spacing:-0.03em;color:#fff}
+  .body-demo{font-size:14px;font-weight:500;color:#dde1e7}
+  .label-demo{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#9aa3af}
+
+  footer.foot{padding:60px 36px;color:#5b6470;text-align:center;font-size:12px}
+</style>
+</head>
+<body>
+
+<!-- Reusable SVG icons -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V9.5z"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h14M3 12h14M3 18h14"/><circle cx="20" cy="6" r="1.2"/><circle cx="20" cy="12" r="1.2"/><circle cx="20" cy="18" r="1.2"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h13l2 4H5a2 2 0 0 1-2-2z"/><path d="M3 7v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-9H5"/><circle cx="17" cy="14" r="1.5"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M6 16V9M11 16V5M16 16v-6M21 16v-3"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0v5l1.5 3h-15L6 13z"/><path d="M10 19a2 2 0 0 0 4 0"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 9v6l-4-2v-4z"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6 9 12l6 6"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 14l5-5 5 5"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M14 5l7 7-7 7"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8"/></symbol>
+    <symbol id="i-coffee" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M17 11h2a2 2 0 0 1 0 4h-2"/><path d="M7 3v2M11 3v2M15 3v2"/></symbol>
+    <symbol id="i-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l2-6h14l2 6"/><path d="M3 13v5h2v-2h14v2h2v-5z"/><circle cx="7" cy="16" r="1.4"/><circle cx="17" cy="16" r="1.4"/></symbol>
+    <symbol id="i-bag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></symbol>
+    <symbol id="i-bank" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 4l9 6"/><path d="M5 10v9M19 10v9M9 10v9M15 10v9M3 20h18"/></symbol>
+    <symbol id="i-cash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 9v6M18 9v6"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M6 15h3"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="8" cy="8" r="1.5"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="14" r="4"/><path d="M11 11l9-9M16 7l3 3"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path d="M15 8l4 4-4 4M9 12h10"/></symbol>
+  </defs>
+</svg>
+
+<header class="page">
+  <div class="kicker">Enko · v2 wireframes</div>
+  <h1>One bold accent.<br>Two confident themes.</h1>
+  <p>Dark and light, equal polish. Wise green (#9FE870) owns CTAs, FAB, active states, and chart lines — everywhere else is restrained neutrals. Category accents appear only as small dots and icon backgrounds, never as page-wide tints. Heavy display type, 3D hero moments, line icons inline, platform-split nav.</p>
+
+  <div class="foundation">
+    <div class="fcard">
+      <h4>Brand · single accent</h4>
+      <div class="sw"><i style="background:#9FE870"></i>brand<code>#9FE870</code></div>
+      <div class="sw"><i style="background:#6FC93F"></i>brand-deep (light mode)<code>#6FC93F</code></div>
+      <div class="sw"><i style="background:#062A14"></i>on-brand<code>#062A14</code></div>
+      <div class="sw"><i style="background:rgba(159,232,112,.16);border:1px dashed rgba(159,232,112,.4)"></i>brand-soft · dark<code>14% α</code></div>
+      <div class="sw"><i style="background:#E0F3CC"></i>brand-soft · light<code>#E0F3CC</code></div>
+    </div>
+    <div class="fcard">
+      <h4>Surface stack · dark</h4>
+      <div class="sw"><i style="background:#0B0D10"></i>surface<code>#0B0D10</code></div>
+      <div class="sw"><i style="background:#15181C"></i>surface-1<code>#15181C</code></div>
+      <div class="sw"><i style="background:#1E2226"></i>surface-2<code>#1E2226</code></div>
+      <div class="sw"><i style="background:#272C32"></i>surface-3<code>#272C32</code></div>
+      <div class="sw"><i style="background:#F2F5F9"></i>on-surface<code>#F2F5F9</code></div>
+      <div class="sw"><i style="background:#8A939F"></i>on-muted<code>#8A939F</code></div>
+    </div>
+    <div class="fcard">
+      <h4>Surface stack · light</h4>
+      <div class="sw"><i style="background:#FAFBF6"></i>surface<code>#FAFBF6</code></div>
+      <div class="sw"><i style="background:#F2F4ED"></i>surface-1<code>#F2F4ED</code></div>
+      <div class="sw"><i style="background:#E9ECE2"></i>surface-2<code>#E9ECE2</code></div>
+      <div class="sw"><i style="background:#DFE3D7"></i>surface-3<code>#DFE3D7</code></div>
+      <div class="sw"><i style="background:#0B0E08"></i>on-surface<code>#0B0E08</code></div>
+      <div class="sw"><i style="background:#5A6253"></i>on-muted<code>#5A6253</code></div>
+    </div>
+    <div class="fcard">
+      <h4>Amount chips · semantic</h4>
+      <div class="sw"><i style="background:#103B25"></i>+ income (dark)<code>mint</code></div>
+      <div class="sw"><i style="background:#3F0F12"></i>− expense (dark)<code>blush</code></div>
+      <div class="sw"><i style="background:#1A2049"></i>info / delta (dark)<code>indigo</code></div>
+      <div class="sw"><i style="background:#D5F2DF"></i>+ income (light)<code>mint</code></div>
+      <div class="sw"><i style="background:#FCDCDE"></i>− expense (light)<code>blush</code></div>
+    </div>
+    <div class="fcard">
+      <h4>Category accents · dots only</h4>
+      <div class="sw"><i style="background:#F0A23B"></i>Food<code>#F0A23B</code></div>
+      <div class="sw"><i style="background:#5DA8FF"></i>Transit<code>#5DA8FF</code></div>
+      <div class="sw"><i style="background:#C18AFF"></i>Shopping<code>#C18AFF</code></div>
+      <div class="sw"><i style="background:#FF7B9D"></i>Fun<code>#FF7B9D</code></div>
+      <div class="sw"><i style="background:#71D9C8"></i>Health<code>#71D9C8</code></div>
+      <div class="sw"><i style="background:#8A8FA8"></i>Bills<code>#8A8FA8</code></div>
+    </div>
+    <div class="fcard">
+      <h4>Type scale · Plus Jakarta Sans</h4>
+      <div class="type-row"><span class="lbl">D-XL · 44</span><span class="sample"><div class="display-demo-xl">Aa 24,380</div></span></div>
+      <div class="type-row"><span class="lbl">D-LG · 34</span><span class="sample"><div class="display-demo-lg">Expenses</div></span></div>
+      <div class="type-row"><span class="lbl">D-MD · 24</span><span class="sample"><div class="display-demo-md">Recent activity</div></span></div>
+      <div class="type-row"><span class="lbl">Body · 14</span><span class="sample"><div class="body-demo">Coffee at CBE — ETB 80</div></span></div>
+      <div class="type-row"><span class="lbl">Label · 10</span><span class="sample"><div class="label-demo">Total balance</div></span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== AUTH & ONBOARDING ==================== -->
+<section class="group">
+  <h2>Auth &amp; onboarding · dark + light</h2>
+  <div class="grid">
+
+    <!-- ONBOARDING -->
+    <div>
+      <div class="pair">
+        <div>
+          <div class="phone"><div class="screen dark">
+            <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+            <div style="padding:14px 22px 0;display:flex;justify-content:space-between;align-items:center">
+              <span class="label-up" style="color:var(--on-dim)">1 / 3</span>
+              <span style="font-size:13px;color:var(--on-muted);font-weight:600">Skip</span>
+            </div>
+            <div style="padding:22px 22px 0">
+              <div class="hero3d"><div class="label">3D illustration</div></div>
+            </div>
+            <div style="padding:22px 22px 0;display:flex;flex-direction:column;gap:10px">
+              <div class="display-xl">Track every<br>birr.</div>
+              <div style="font-size:14px;color:var(--on-muted);line-height:1.5;font-weight:500">Capture expenses by typing what you bought. Enko's AI sorts the rest.</div>
+            </div>
+            <div style="margin-top:auto;padding:0 22px 26px;display:flex;flex-direction:column;gap:18px">
+              <div class="dots"><i class="on"></i><i></i><i></i></div>
+              <div class="btn">Get started</div>
+            </div>
+          </div></div>
+          <div class="cap"><span class="dot"></span><b>Dark</b> · Onboarding</div>
+        </div>
+        <div>
+          <div class="phone"><div class="screen light">
+            <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+            <div style="padding:14px 22px 0;display:flex;justify-content:space-between;align-items:center">
+              <span class="label-up">1 / 3</span>
+              <span style="font-size:13px;color:var(--on-muted);font-weight:600">Skip</span>
+            </div>
+            <div style="padding:22px 22px 0">
+              <div class="hero3d"><div class="label">3D illustration</div></div>
+            </div>
+            <div style="padding:22px 22px 0;display:flex;flex-direction:column;gap:10px">
+              <div class="display-xl">Track every<br>birr.</div>
+              <div style="font-size:14px;color:var(--on-muted);line-height:1.5;font-weight:500">Capture expenses by typing what you bought. Enko's AI sorts the rest.</div>
+            </div>
+            <div style="margin-top:auto;padding:0 22px 26px;display:flex;flex-direction:column;gap:18px">
+              <div class="dots"><i class="on"></i><i></i><i></i></div>
+              <div class="btn">Get started</div>
+            </div>
+          </div></div>
+          <div class="cap"><span class="dot light"></span><b>Light</b> · Onboarding</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIGN IN -->
+    <div>
+      <div class="pair">
+        <div>
+          <div class="phone"><div class="screen dark">
+            <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+            <div style="padding:20px 22px 0;flex:1;display:flex;flex-direction:column;gap:20px">
+              <div style="width:42px;height:42px;border-radius:14px;background:var(--brand);color:var(--on-brand);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;letter-spacing:-0.04em">E</div>
+              <div class="display-xl">Sign in.</div>
+              <div style="color:var(--on-muted);font-size:14px;font-weight:500;margin-top:-12px">Welcome back. Track from where you left off.</div>
+              <div class="field" style="margin-top:6px"><label>Email</label><div class="input"><span class="ph">you@example.com</span></div></div>
+              <div class="field"><label>Password</label><div class="input"><span class="ph">••••••••</span><svg style="width:18px;height:18px;color:var(--on-muted)"><use href="#i-eye"/></svg></div></div>
+              <div style="text-align:right;font-size:13px;color:var(--brand);font-weight:700">Forgot password?</div>
+            </div>
+            <div style="padding:0 22px 26px;display:flex;flex-direction:column;gap:10px">
+              <div class="btn">Sign in</div>
+              <div class="btn ghost">Continue with Google</div>
+              <div style="text-align:center;color:var(--on-muted);font-size:12px;margin-top:6px">No account? <b style="color:var(--brand)">Create one</b></div>
+            </div>
+          </div></div>
+          <div class="cap"><span class="dot"></span><b>Dark</b> · Sign in</div>
+        </div>
+        <div>
+          <div class="phone"><div class="screen light">
+            <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+            <div style="padding:20px 22px 0;flex:1;display:flex;flex-direction:column;gap:20px">
+              <div style="width:42px;height:42px;border-radius:14px;background:var(--brand);color:var(--on-brand);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;letter-spacing:-0.04em">E</div>
+              <div class="display-xl">Sign in.</div>
+              <div style="color:var(--on-muted);font-size:14px;font-weight:500;margin-top:-12px">Welcome back. Track from where you left off.</div>
+              <div class="field" style="margin-top:6px"><label>Email</label><div class="input"><span class="ph">you@example.com</span></div></div>
+              <div class="field"><label>Password</label><div class="input"><span class="ph">••••••••</span><svg style="width:18px;height:18px;color:var(--on-muted)"><use href="#i-eye"/></svg></div></div>
+              <div style="text-align:right;font-size:13px;color:var(--brand-deep);font-weight:700">Forgot password?</div>
+            </div>
+            <div style="padding:0 22px 26px;display:flex;flex-direction:column;gap:10px">
+              <div class="btn">Sign in</div>
+              <div class="btn ghost">Continue with Google</div>
+              <div style="text-align:center;color:var(--on-muted);font-size:12px;margin-top:6px">No account? <b style="color:var(--brand-deep)">Create one</b></div>
+            </div>
+          </div></div>
+          <div class="cap"><span class="dot light"></span><b>Light</b> · Sign in</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ==================== HOME ==================== -->
+<section class="group">
+  <h2>Home · dashboard</h2>
+  <div class="grid">
+    <div>
+      <div class="pair">
+        <!-- HOME DARK -->
+        <div>
+          <div class="phone"><div class="screen dark">
+            <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+            <div class="hero-panel brand">
+              <div class="topbar">
+                <div class="who">
+                  <div class="avatar">N</div>
+                  <div>
+                    <div class="greet">Good morning,</div>
+                    <div class="name">Nathan</div>
+                  </div>
+                </div>
+                <div class="icon-row">
+                  <div class="icon-btn"><svg style="width:18px;height:18px"><use href="#i-bell"/></svg><span class="dot"></span></div>
+                </div>
+              </div>
+              <div class="label-up" style="margin-bottom:6px">Total balance</div>
+              <div class="balance"><span class="cur">ETB</span>24,380<span class="cents">.00</span></div>
+              <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+                <span class="chip-amt pos">▲ 4.2%</span>
+                <span style="font-size:11px;color:var(--on-muted);font-weight:600">vs last month</span>
+              </div>
+            </div>
+            <div class="body">
+              <div class="seg"><span>Week</span><span class="on">Month</span><span>Year</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div class="card" style="padding:14px">
+                  <span class="label-up">Income</span>
+                  <div style="font-size:18px;font-weight:800;letter-spacing:-0.03em">+18,400</div>
+                  <span class="chip-amt pos" style="align-self:flex-start;padding:3px 8px;font-size:10px">▲ 12%</span>
+                </div>
+                <div class="card" style="padding:14px">
+                  <span class="label-up">Spent</span>
+                  <div style="font-size:18px;font-weight:800;letter-spacing:-0.03em">−4,120</div>
+                  <span class="chip-amt neg" style="align-self:flex-start;padding:3px 8px;font-size:10px">▲ 8%</span>
+                </div>
+              </div>
+              <div class="card">
+                <div class="section-h" style="padding:0"><span class="t">Recent activity</span><span class="x">See all →</span></div>
+                <div class="row"><div class="ic cat-food"><svg><use href="#i-coffee"/></svg></div><div class="meta"><b>Coffee</b><span>Today · 9:12</span></div><span class="chip-amt neg">−80</span></div>
+                <div class="row"><div class="ic cat-transit"><svg><use href="#i-car"/></svg></div><div class="meta"><b>Uber to office</b><span>Today · 8:30</span></div><span class="chip-amt neg">−250</span></div>
+                <div class="row"><div class="ic cat-income"><svg><use href="#i-cash"/></svg></div><div class="meta"><b>Salary deposit</b><span>May 1</span></div><span class="chip-amt pos">+18,400</span></div>
+              </div>
+            </div>
+            <div class="tabbar">
+              <div class="tab active"><div class="indicator"></div><svg><use href="#i-home"/></svg>Home</div>
+              <div class="tab"><svg><use href="#i-list"/></svg>Expenses</div>
+              <div class="tab"><svg><use href="#i-wallet"/></svg>Money</div>
+              <div class="tab"><svg><use href="#i-chart"/></svg>Insights</div>
+              <div class="tab"><svg><use href="#i-user"/></svg>Profile</div>
+            </div>
+          </div></div>
+          <div class="cap"><span class="dot"></span><b>Dark</b> · Home · iOS flat tabbar</div>
+        </div>
+        <!-- HOME LIGHT -->
+        <div>
+          <div class="phone"><div class="screen light">
+            <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+            <div class="hero-panel brand">
+              <div class="topbar">
+                <div class="who">
+                  <div class="avatar">N</div>
+                  <div>
+                    <div class="greet">Good morning,</div>
+                    <div class="name">Nathan</div>
+                  </div>
+                </div>
+                <div class="icon-row">
+                  <div class="icon-btn"><svg style="width:18px;height:18px"><use href="#i-bell"/></svg><span class="dot"></span></div>
+                </div>
+              </div>
+              <div class="label-up" style="margin-bottom:6px">Total balance</div>
+              <div class="balance"><span class="cur">ETB</span>24,380<span class="cents">.00</span></div>
+              <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+                <span class="chip-amt pos">▲ 4.2%</span>
+                <span style="font-size:11px;color:var(--on-muted);font-weight:600">vs last month</span>
+              </div>
+            </div>
+            <div class="body">
+              <div class="seg"><span>Week</span><span class="on">Month</span><span>Year</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div class="card" style="padding:14px">
+                  <span class="label-up">Income</span>
+                  <div style="font-size:18px;font-weight:800;letter-spacing:-0.03em">+18,400</div>
+                  <span class="chip-amt pos" style="align-self:flex-start;padding:3px 8px;font-size:10px">▲ 12%</span>
+                </div>
+                <div class="card" style="padding:14px">
+                  <span class="label-up">Spent</span>
+                  <div style="font-size:18px;font-weight:800;letter-spacing:-0.03em">−4,120</div>
+                  <span class="chip-amt neg" style="align-self:flex-start;padding:3px 8px;font-size:10px">▲ 8%</span>
+                </div>
+              </div>
+              <div class="card">
+                <div class="section-h" style="padding:0"><span class="t">Recent activity</span><span class="x">See all →</span></div>
+                <div class="row"><div class="ic cat-food"><svg><use href="#i-coffee"/></svg></div><div class="meta"><b>Coffee</b><span>Today · 9:12</span></div><span class="chip-amt neg">−80</span></div>
+                <div class="row"><div class="ic cat-transit"><svg><use href="#i-car"/></svg></div><div class="meta"><b>Uber to office</b><span>Today · 8:30</span></div><span class="chip-amt neg">−250</span></div>
+                <div class="row"><div class="ic cat-income"><svg><use href="#i-cash"/></svg></div><div class="meta"><b>Salary deposit</b><span>May 1</span></div><span class="chip-amt pos">+18,400</span></div>
+              </div>
+            </div>
+            <div class="tabbar">
+              <div class="tab active"><div class="indicator"></div><svg><use href="#i-home"/></svg>Home</div>
+              <div class="tab"><svg><use href="#i-list"/></svg>Expenses</div>
+              <div class="tab"><svg><use href="#i-wallet"/></svg>Money</div>
+              <div class="tab"><svg><use href="#i-chart"/></svg>Insights</div>
+              <div class="tab"><svg><use href="#i-user"/></svg>Profile</div>
+            </div>
+          </div></div>
+          <div class="cap"><span class="dot light"></span><b>Light</b> · Home · iOS flat tabbar</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== EXPENSES ==================== -->
+<section class="group">
+  <h2>Expenses · list + add sheet</h2>
+  <div class="grid">
+
+    <div>
+      <div class="pair">
+        <!-- DARK -->
+        <div>
+          <div class="phone"><div class="screen dark">
+            <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+            <div class="hero-panel">
+              <div class="topbar">
+                <div style="display:flex;align-items:center;gap:6px"><svg style="width:22px;height:22px;color:var(--on-muted)"><use href="#i-back"/></svg></div>
+                <div class="icon-row"><div class="icon-btn"><svg style="width:18px;height:18px"><use href="#i-search"/></svg></div><div class="icon-btn"><svg style="width:18px;height:18px"><use href="#i-filter"/></svg></div></div>
+              </div>
+              <div class="display-lg" style="margin-top:6px">Expenses</div>
+              <div style="display:flex;align-items:baseline;gap:8px;margin-top:10px">
+                <span class="label-up">May · Total</span>
+                <span style="font-size:18px;font-weight:800;letter-spacing:-0.03em;color:var(--on)">−ETB 4,120</span>
+              </div>
+              <div class="chips" style="margin-top:14px">
+                <span class="chip on">All</span>
+                <span class="chip">Food</span>
+                <span class="chip">Transit</span>
+                <span class="chip brand">✦ AI parsed</span>
+              </div>
+            </div>
+            <div class="body">
+              <div class="dgroup">Today · ETB 510</div>
+              <div class="card tight">
+                <div class="row"><div class="ic cat-food"><svg><use href="#i-coffee"/></svg></div><div class="meta"><b>Coffee</b><span>Cash · 9:12</span></div><span class="chip-amt neg">−80</span></div>
+                <div class="row"><div class="ic cat-transit"><svg><use href="#i-car"/></svg></div><div class="meta"><b>Uber to office</b><span>CBE · 8:30</span></div><span class="chip-amt neg">−250</span></div>
+                <div class="row"><div class="ic cat-food"><svg><use href="#i-coffee"/></svg></div><div class="meta"><b>Lunch <span style="background:var(--brand-soft);color:var(--brand);font-size:9px;padding:2px 6px;border-radius:6px;margin-left:4px;font-weight:700;letter-spacing:0.06em">AI</span></b><span>CBE · 13:04</span></div><span class="chip-amt neg">−180</span></div>
+              </div>
+              <div class="dgroup">Yesterday · ETB 1,200</div>
+              <div class="card tight">
+                <div class="row"><div class="ic cat-shop"><svg><use href="#i-bag"/></svg></div><div class="meta"><b>Groceries · Shoa</b><span>CBE</span></div><span class="chip-amt neg">−1,200</span></div>
+              </div>
+            </div>
+            <div class="fab"><svg><use href="#i-plus"/></svg></div>
+            <div class="tabbar">
+              <div class="tab"><svg><use href="#i-home"/></svg>Home</div>
+              <div class="tab active"><div class="indicator"></div><svg><use href="#i-list"/></svg>Expenses</div>
+              <div class="tab"><svg><use href="#i-wallet"/></svg>Money</div>
+              <div class="tab"><svg><use href="#i-chart"/></svg>Insights</div>
+              <div class="tab"><svg><use href="#i-user"/></svg>Profile</div>
+            </div>
+          </div></div>
+          <div class="cap"><span class="dot"></span><b>Dark</b> · Expenses</div>
+        </div>
+        <!-- LIGHT -->
+        <div>
+          <div class="phone"><div class="screen light">
+            <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+            <div class="hero-panel">
+              <div class="topbar">
+                <div style="display:flex;align-items:center;gap:6px"><svg style="width:22px;height:22px;color:var(--on-muted)"><use href="#i-back"/></svg></div>
+                <div class="icon-row"><div class="icon-btn"><svg style="width:18px;height:18px"><use href="#i-search"/></svg></div><div class="icon-btn"><svg style="width:18px;height:18px"><use href="#i-filter"/></svg></div></div>
+              </div>
+              <div class="display-lg" style="margin-top:6px">Expenses</div>
+              <div style="display:flex;align-items:baseline;gap:8px;margin-top:10px">
+                <span class="label-up">May · Total</span>
+                <span style="font-size:18px;font-weight:800;letter-spacing:-0.03em;color:var(--on)">−ETB 4,120</span>
+              </div>
+              <div class="chips" style="margin-top:14px">
+                <span class="chip on">All</span>
+                <span class="chip">Food</span>
+                <span class="chip">Transit</span>
+                <span class="chip brand">✦ AI parsed</span>
+              </div>
+            </div>
+            <div class="body">
+              <div class="dgroup">Today · ETB 510</div>
+              <div class="card tight">
+                <div class="row"><div class="ic cat-food"><svg><use href="#i-coffee"/></svg></div><div class="meta"><b>Coffee</b><span>Cash · 9:12</span></div><span class="chip-amt neg">−80</span></div>
+                <div class="row"><div class="ic cat-transit"><svg><use href="#i-car"/></svg></div><div class="meta"><b>Uber to office</b><span>CBE · 8:30</span></div><span class="chip-amt neg">−250</span></div>
+                <div class="row"><div class="ic cat-food"><svg><use href="#i-coffee"/></svg></div><div class="meta"><b>Lunch <span style="background:var(--brand-soft);color:var(--brand-deep);font-size:9px;padding:2px 6px;border-radius:6px;margin-left:4px;font-weight:700;letter-spacing:0.06em">AI</span></b><span>CBE · 13:04</span></div><span class="chip-amt neg">−180</span></div>
+              </div>
+              <div class="dgroup">Yesterday · ETB 1,200</div>
+              <div class="card tight">
+                <div class="row"><div class="ic cat-shop"><svg><use href="#i-bag"/></svg></div><div class="meta"><b>Groceries · Shoa</b><span>CBE</span></div><span class="chip-amt neg">−1,200</span></div>
+              </div>
+            </div>
+            <div class="fab"><svg><use href="#i-plus"/></svg></div>
+            <div class="tabbar">
+              <div class="tab"><svg><use href="#i-home"/></svg>Home</div>
+              <div class="tab active"><div class="indicator"></div><svg><use href="#i-list"/></svg>Expenses</div>
+              <div class="tab"><svg><use href="#i-wallet"/></svg>Money</div>
+              <div class="tab"><svg><use href="#i-chart"/></svg>Insights</div>
+              <div class="tab"><svg><use href="#i-user"/></svg>Profile</div>
+            </div>
+          </div></div>
+          <div class="cap"><span class="dot light"></span><b>Light</b> · Expenses</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD EXPENSE SHEET -->
+    <div>
+      <div class="pair">
+        <div>
+          <div class="phone"><div class="screen dark">
+            <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+            <div class="hero-panel" style="opacity:.35"><div class="topbar"><div></div></div><div class="display-lg">Expenses</div></div>
+            <div class="body" style="opacity:.25"></div>
+            <div class="scrim"></div>
+            <div class="sheet">
+              <div class="grabber"></div>
+              <div style="display:flex;align-items:center;justify-content:space-between"><div class="display-md">Add expense</div><div style="background:var(--brand-soft);color:var(--brand);padding:6px 11px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase">✦ AI</div></div>
+              <div class="input brand-bg" style="padding:22px 18px;justify-content:flex-start;gap:8px">
+                <span style="font-size:14px;font-weight:700;opacity:.7">ETB</span>
+                <span style="font-size:32px;font-weight:800;letter-spacing:-0.04em" class="num">120.00</span>
+              </div>
+              <div class="field"><label>Or describe it</label><div class="input"><span class="ph">"Coffee 80 birr at CBE…"</span><svg style="width:18px;height:18px;color:var(--brand)"><use href="#i-sparkle"/></svg></div></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div class="field"><label>Category</label><div class="input"><span>Food</span><svg style="width:14px;height:14px;color:var(--on-muted);transform:rotate(90deg)"><use href="#i-back"/></svg></div></div>
+                <div class="field"><label>Source</label><div class="input"><span>CBE</span><svg style="width:14px;height:14px;color:var(--on-muted);transform:rotate(90deg)"><use href="#i-back"/></svg></div></div>
+              </div>
+              <div class="field"><label>Date</label><div class="input"><span>Today, May 5</span><svg style="width:14px;height:14px;color:var(--on-muted);transform:rotate(90deg)"><use href="#i-back"/></svg></div></div>
+              <div style="display:flex;gap:10px"><div class="btn ghost" style="flex:1">Cancel</div><div class="btn" style="flex:2">Save expense</div></div>
+            </div>
+          </div></div>
+          <div class="cap"><span class="dot"></span><b>Dark</b> · Add expense sheet</div>
+        </div>
+        <div>
+          <div class="phone"><div class="screen light">
+            <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+            <div class="hero-panel" style="opacity:.35"><div class="topbar"><div></div></div><div class="display-lg">Expenses</div></div>
+            <div class="body" style="opacity:.25"></div>
+            <div class="scrim"></div>
+            <div class="sheet">
+              <div class="grabber"></div>
+              <div style="display:flex;align-items:center;justify-content:space-between"><div class="display-md">Add expense</div><div style="background:var(--brand-soft);color:var(--brand-deep);padding:6px 11px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase">✦ AI</div></div>
+              <div class="input brand-bg" style="padding:22px 18px;justify-content:flex-start;gap:8px">
+                <span style="font-size:14px;font-weight:700;opacity:.7">ETB</span>
+                <span style="font-size:32px;font-weight:800;letter-spacing:-0.04em" class="num">120.00</span>
+              </div>
+              <div class="field"><label>Or describe it</label><div class="input"><span class="ph">"Coffee 80 birr at CBE…"</span><svg style="width:18px;height:18px;color:var(--brand-deep)"><use href="#i-sparkle"/></svg></div></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div class="field"><label>Category</label><div class="input"><span>Food</span><svg style="width:14px;height:14px;color:var(--on-muted);transform:rotate(90deg)"><use href="#i-back"/></svg></div></div>
+                <div class="field"><label>Source</label><div class="input"><span>CBE</span><svg style="width:14px;height:14px;color:var(--on-muted);transform:rotate(90deg)"><use href="#i-back"/></svg></div></div>
+              </div>
+              <div class="field"><label>Date</label><div class="input"><span>Today, May 5</span><svg style="width:14px;height:14px;color:var(--on-muted);transform:rotate(90deg)"><use href="#i-back"/></svg></div></div>
+              <div style="display:flex;gap:10px"><div class="btn ghost" style="flex:1">Cancel</div><div class="btn" style="flex:2">Save expense</div></div>
+            </div>
+          </div></div>
+          <div class="cap"><span class="dot light"></span><b>Light</b> · Add expense sheet</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ==================== MONEY ==================== -->
+<section class="group">
+  <h2>Money · accounts</h2>
+  <div class="grid">
+    <div>
+      <div class="pair">
+        <div>
+          <div class="phone"><div class="screen dark">
+            <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+            <div class="hero-panel brand">
+              <div class="topbar">
+                <div></div>
+                <div class="icon-btn"><svg style="width:18px;height:18px"><use href="#i-plus"/></svg></div>
+              </div>
+              <div class="display-lg" style="margin-top:6px">Money</div>
+              <div class="label-up" style="margin-top:14px">Net worth</div>
+              <div class="balance" style="font-size:34px"><span class="cur">ETB</span>24,380<span class="cents">.00</span></div>
+              <div style="margin-top:8px"><span class="chip-amt info">3 accounts</span></div>
+            </div>
+            <div class="body">
+              <div class="acct-card brand">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                  <div class="ic cat-income" style="width:46px;height:46px;border-radius:16px"><svg style="width:22px;height:22px"><use href="#i-bank"/></svg></div>
+                  <span style="font-size:10px;color:var(--brand);font-weight:800;letter-spacing:0.1em;text-transform:uppercase">★ Default</span>
+                </div>
+                <div style="margin-top:6px"><span class="label-up">CBE</span><div style="font-size:26px;font-weight:800;letter-spacing:-0.035em" class="num">ETB 18,200</div></div>
+                <div class="barline" style="margin-top:8px"><i style="height:30%"></i><i style="height:50%"></i><i style="height:42%"></i><i style="height:70%"></i><i style="height:60%"></i><i style="height:78%"></i><i style="height:64%"></i><i style="height:90%"></i><i style="height:82%"></i><i style="height:96%"></i></div>
+              </div>
+              <div class="row" style="background:var(--surface-1);border-radius:22px;padding:14px 16px">
+                <div class="ic cat-bills" style="width:46px;height:46px;border-radius:16px"><svg style="width:22px;height:22px"><use href="#i-cash"/></svg></div>
+                <div class="meta"><b>Cash</b><span>Last activity · yesterday</span></div>
+                <div style="font-size:16px;font-weight:800;letter-spacing:-0.02em" class="num">3,180</div>
+              </div>
+              <div class="row" style="background:var(--surface-1);border-radius:22px;padding:14px 16px">
+                <div class="ic cat-transit" style="width:46px;height:46px;border-radius:16px"><svg style="width:22px;height:22px"><use href="#i-card"/></svg></div>
+                <div class="meta"><b>Awash</b><span>Last activity · May 1</span></div>
+                <div style="font-size:16px;font-weight:800;letter-spacing:-0.02em" class="num">3,000</div>
+              </div>
+              <div style="display:flex;gap:10px"><div class="btn" style="flex:1">+ Add funds</div><div class="btn tonal" style="flex:1">Edit</div></div>
+            </div>
+            <div class="tabbar">
+              <div class="tab"><svg><use href="#i-home"/></svg>Home</div>
+              <div class="tab"><svg><use href="#i-list"/></svg>Expenses</div>
+              <div class="tab active"><div class="indicator"></div><svg><use href="#i-wallet"/></svg>Money</div>
+              <div class="tab"><svg><use href="#i-chart"/></svg>Insights</div>
+              <div class="tab"><svg><use href="#i-user"/></svg>Profile</div>
+            </div>
+          </div></div>
+          <div class="cap"><span class="dot"></span><b>Dark</b> · Money</div>
+        </div>
+        <div>
+          <div class="phone"><div class="screen light">
+            <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+            <div class="hero-panel brand">
+              <div class="topbar">
+                <div></div>
+                <div class="icon-btn"><svg style="width:18px;height:18px"><use href="#i-plus"/></svg></div>
+              </div>
+              <div class="display-lg" style="margin-top:6px">Money</div>
+              <div class="label-up" style="margin-top:14px">Net worth</div>
+              <div class="balance" style="font-size:34px"><span class="cur">ETB</span>24,380<span class="cents">.00</span></div>
+              <div style="margin-top:8px"><span class="chip-amt info">3 accounts</span></div>
+            </div>
+            <div class="body">
+              <div class="acct-card brand">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                  <div class="ic cat-income" style="width:46px;height:46px;border-radius:16px"><svg style="width:22px;height:22px"><use href="#i-bank"/></svg></div>
+                  <span style="font-size:10px;color:var(--brand-deep);font-weight:800;letter-spacing:0.1em;text-transform:uppercase">★ Default</span>
+                </div>
+                <div style="margin-top:6px"><span class="label-up">CBE</span><div style="font-size:26px;font-weight:800;letter-spacing:-0.035em" class="num">ETB 18,200</div></div>
+                <div class="barline" style="margin-top:8px"><i style="height:30%"></i><i style="height:50%"></i><i style="height:42%"></i><i style="height:70%"></i><i style="height:60%"></i><i style="height:78%"></i><i style="height:64%"></i><i style="height:90%"></i><i style="height:82%"></i><i style="height:96%"></i></div>
+              </div>
+              <div class="row" style="background:var(--surface-1);border-radius:22px;padding:14px 16px">
+                <div class="ic cat-bills" style="width:46px;height:46px;border-radius:16px"><svg style="width:22px;height:22px"><use href="#i-cash"/></svg></div>
+                <div class="meta"><b>Cash</b><span>Last activity · yesterday</span></div>
+                <div style="font-size:16px;font-weight:800;letter-spacing:-0.02em" class="num">3,180</div>
+              </div>
+              <div class="row" style="background:var(--surface-1);border-radius:22px;padding:14px 16px">
+                <div class="ic cat-transit" style="width:46px;height:46px;border-radius:16px"><svg style="width:22px;height:22px"><use href="#i-card"/></svg></div>
+                <div class="meta"><b>Awash</b><span>Last activity · May 1</span></div>
+                <div style="font-size:16px;font-weight:800;letter-spacing:-0.02em" class="num">3,000</div>
+              </div>
+              <div style="display:flex;gap:10px"><div class="btn" style="flex:1">+ Add funds</div><div class="btn tonal" style="flex:1">Edit</div></div>
+            </div>
+            <div class="tabbar">
+              <div class="tab"><svg><use href="#i-home"/></svg>Home</div>
+              <div class="tab"><svg><use href="#i-list"/></svg>Expenses</div>
+              <div class="tab active"><div class="indicator"></div><svg><use href="#i-wallet"/></svg>Money</div>
+              <div class="tab"><svg><use href="#i-chart"/></svg>Insights</div>
+              <div class="tab"><svg><use href="#i-user"/></svg>Profile</div>
+            </div>
+          </div></div>
+          <div class="cap"><span class="dot light"></span><b>Light</b> · Money</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== INSIGHTS ==================== -->
+<section class="group">
+  <h2>Insights</h2>
+  <div class="grid">
+    <div>
+      <div class="pair">
+        <div>
+          <div class="phone"><div class="screen dark">
+            <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+            <div class="hero-panel">
+              <div class="topbar"><div></div><div class="icon-btn"><svg style="width:18px;height:18px"><use href="#i-arrow-up"/></svg></div></div>
+              <div class="display-lg" style="margin-top:6px">Insights</div>
+              <div style="font-size:13px;color:var(--on-muted);font-weight:500;margin-top:6px">May 1 – May 5</div>
+            </div>
+            <div class="body">
+              <div class="seg"><span>Week</span><span class="on">Month</span><span>Year</span></div>
+              <div class="card">
+                <span class="label-up">Composition</span>
+                <div style="display:flex;align-items:center;gap:14px;margin-top:8px">
+                  <div style="width:96px;height:96px;border-radius:50%;background:conic-gradient(var(--cat-food) 0 42%, var(--cat-transit) 42% 60%, var(--cat-shop) 60% 78%, var(--cat-fun) 78% 90%, var(--cat-bills) 90% 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <div style="width:62px;height:62px;border-radius:50%;background:var(--surface-1)"></div>
+                  </div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:8px;font-size:12px;font-weight:600">
+                    <div style="display:flex;align-items:center;gap:6px"><span class="cdot" style="background:var(--cat-food)"></span>Food <span style="margin-left:auto;color:var(--on-muted)">42%</span></div>
+                    <div style="display:flex;align-items:center;gap:6px"><span class="cdot" style="background:var(--cat-transit)"></span>Transit <span style="margin-left:auto;color:var(--on-muted)">18%</span></div>
+                    <div style="display:flex;align-items:center;gap:6px"><span class="cdot" style="background:var(--cat-shop)"></span>Shop <span style="margin-left:auto;color:var(--on-muted)">18%</span></div>
+                    <div style="display:flex;align-items:center;gap:6px"><span class="cdot" style="background:var(--cat-fun)"></span>Fun <span style="margin-left:auto;color:var(--on-muted)">12%</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <span class="label-up">Budget vs actual</span>
+                <div style="margin-top:6px;display:flex;flex-direction:column;gap:10px">
+                  <div><div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600"><span>Food</span><span class="num">80%</span></div><div class="progress" style="margin-top:5px"><i style="width:80%"></i></div></div>
+                  <div><div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600"><span>Transit</span><span class="num">40%</span></div><div class="progress" style="margin-top:5px"><i style="width:40%"></i></div></div>
+                  <div><div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600"><span>Shop</span><span class="num" style="color:var(--chip-neg-on)">over</span></div><div class="progress" style="margin-top:5px"><i style="width:100%;background:var(--chip-neg-on)"></i></div></div>
+                </div>
+              </div>
+              <div class="card" style="background:var(--brand-soft);color:var(--on)">
+                <div style="display:flex;gap:12px;align-items:center"><div style="width:38px;height:38px;border-radius:14px;background:var(--brand);color:var(--on-brand);display:flex;align-items:center;justify-content:center"><svg style="width:18px;height:18px"><use href="#i-sparkle"/></svg></div><div><div style="font-weight:800;font-size:14px;letter-spacing:-0.01em">23% less on food than peers</div><div style="font-size:11px;color:var(--on-muted);font-weight:500;margin-top:2px">Compared to users with similar income</div></div></div>
+              </div>
+            </div>
+            <div class="tabbar">
+              <div class="tab"><svg><use href="#i-home"/></svg>Home</div>
+              <div class="tab"><svg><use href="#i-list"/></svg>Expenses</div>
+              <div class="tab"><svg><use href="#i-wallet"/></svg>Money</div>
+              <div class="tab active"><div class="indicator"></div><svg><use href="#i-chart"/></svg>Insights</div>
+              <div class="tab"><svg><use href="#i-user"/></svg>Profile</div>
+            </div>
+          </div></div>
+          <div class="cap"><span class="dot"></span><b>Dark</b> · Insights</div>
+        </div>
+        <div>
+          <div class="phone"><div class="screen light">
+            <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+            <div class="hero-panel">
+              <div class="topbar"><div></div><div class="icon-btn"><svg style="width:18px;height:18px"><use href="#i-arrow-up"/></svg></div></div>
+              <div class="display-lg" style="margin-top:6px">Insights</div>
+              <div style="font-size:13px;color:var(--on-muted);font-weight:500;margin-top:6px">May 1 – May 5</div>
+            </div>
+            <div class="body">
+              <div class="seg"><span>Week</span><span class="on">Month</span><span>Year</span></div>
+              <div class="card">
+                <span class="label-up">Composition</span>
+                <div style="display:flex;align-items:center;gap:14px;margin-top:8px">
+                  <div style="width:96px;height:96px;border-radius:50%;background:conic-gradient(var(--cat-food) 0 42%, var(--cat-transit) 42% 60%, var(--cat-shop) 60% 78%, var(--cat-fun) 78% 90%, var(--cat-bills) 90% 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <div style="width:62px;height:62px;border-radius:50%;background:var(--surface-1)"></div>
+                  </div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:8px;font-size:12px;font-weight:600">
+                    <div style="display:flex;align-items:center;gap:6px"><span class="cdot" style="background:var(--cat-food)"></span>Food <span style="margin-left:auto;color:var(--on-muted)">42%</span></div>
+                    <div style="display:flex;align-items:center;gap:6px"><span class="cdot" style="background:var(--cat-transit)"></span>Transit <span style="margin-left:auto;color:var(--on-muted)">18%</span></div>
+                    <div style="display:flex;align-items:center;gap:6px"><span class="cdot" style="background:var(--cat-shop)"></span>Shop <span style="margin-left:auto;color:var(--on-muted)">18%</span></div>
+                    <div style="display:flex;align-items:center;gap:6px"><span class="cdot" style="background:var(--cat-fun)"></span>Fun <span style="margin-left:auto;color:var(--on-muted)">12%</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <span class="label-up">Budget vs actual</span>
+                <div style="margin-top:6px;display:flex;flex-direction:column;gap:10px">
+                  <div><div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600"><span>Food</span><span class="num">80%</span></div><div class="progress" style="margin-top:5px"><i style="width:80%"></i></div></div>
+                  <div><div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600"><span>Transit</span><span class="num">40%</span></div><div class="progress" style="margin-top:5px"><i style="width:40%"></i></div></div>
+                  <div><div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600"><span>Shop</span><span class="num" style="color:var(--chip-neg-on)">over</span></div><div class="progress" style="margin-top:5px"><i style="width:100%;background:var(--chip-neg-on)"></i></div></div>
+                </div>
+              </div>
+              <div class="card" style="background:var(--brand-soft);color:var(--on)">
+                <div style="display:flex;gap:12px;align-items:center"><div style="width:38px;height:38px;border-radius:14px;background:var(--brand);color:var(--on-brand);display:flex;align-items:center;justify-content:center"><svg style="width:18px;height:18px"><use href="#i-sparkle"/></svg></div><div><div style="font-weight:800;font-size:14px;letter-spacing:-0.01em">23% less on food than peers</div><div style="font-size:11px;color:var(--on-muted);font-weight:500;margin-top:2px">Compared to users with similar income</div></div></div>
+              </div>
+            </div>
+            <div class="tabbar">
+              <div class="tab"><svg><use href="#i-home"/></svg>Home</div>
+              <div class="tab"><svg><use href="#i-list"/></svg>Expenses</div>
+              <div class="tab"><svg><use href="#i-wallet"/></svg>Money</div>
+              <div class="tab active"><div class="indicator"></div><svg><use href="#i-chart"/></svg>Insights</div>
+              <div class="tab"><svg><use href="#i-user"/></svg>Profile</div>
+            </div>
+          </div></div>
+          <div class="cap"><span class="dot light"></span><b>Light</b> · Insights</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PROFILE ==================== -->
+<section class="group">
+  <h2>Profile</h2>
+  <div class="grid">
+    <div>
+      <div class="pair">
+        <div>
+          <div class="phone"><div class="screen dark">
+            <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+            <div class="hero-panel">
+              <div class="topbar"><div></div><div class="icon-btn"><svg style="width:18px;height:18px;transform:rotate(90deg)"><use href="#i-list"/></svg></div></div>
+              <div class="display-lg" style="margin-top:6px">Profile</div>
+              <div style="display:flex;align-items:center;gap:14px;margin-top:18px">
+                <div style="width:56px;height:56px;border-radius:20px;background:var(--brand);color:var(--on-brand);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;letter-spacing:-0.04em">N</div>
+                <div><div style="font-weight:800;font-size:17px;letter-spacing:-0.02em">Nathan Solomon</div><div style="font-size:12px;color:var(--on-muted);font-weight:500">nathan@example.com · ✓ verified</div></div>
+              </div>
+            </div>
+            <div class="body">
+              <div class="dgroup">Preferences</div>
+              <div class="card tight">
+                <div class="row"><div class="ic cat-income"><svg><use href="#i-globe"/></svg></div><div class="meta"><b>Currency</b><span>ETB · Ethiopian birr</span></div><svg style="width:16px;height:16px;color:var(--on-muted);transform:rotate(180deg)"><use href="#i-back"/></svg></div>
+                <div class="row"><div class="ic cat-bills"><svg><use href="#i-eye"/></svg></div><div class="meta"><b>Hide amounts</b><span>Blur balances by default</span></div><div style="width:38px;height:22px;background:var(--surface-2);border-radius:99px;position:relative"><i style="position:absolute;width:16px;height:16px;border-radius:50%;background:var(--on-muted);top:3px;left:3px;display:block"></i></div></div>
+                <div class="row"><div class="ic cat-shop"><svg><use href="#i-sparkle"/></svg></div><div class="meta"><b>Gemini API key</b><span>For AI expense parsing</span></div><span class="chip-amt info">Set</span></div>
+              </div>
+              <div class="dgroup">Data</div>
+              <div class="card tight">
+                <div class="row"><div class="ic cat-fun"><svg><use href="#i-tag"/></svg></div><div class="meta"><b>Categories</b><span>9 default · 2 custom</span></div><svg style="width:16px;height:16px;color:var(--on-muted);transform:rotate(180deg)"><use href="#i-back"/></svg></div>
+                <div class="row"><div class="ic cat-transit"><svg><use href="#i-download"/></svg></div><div class="meta"><b>Export data</b><span>JSON · CSV</span></div><svg style="width:16px;height:16px;color:var(--on-muted);transform:rotate(180deg)"><use href="#i-back"/></svg></div>
+              </div>
+              <div class="dgroup">Account</div>
+              <div class="card tight">
+                <div class="row"><div class="ic cat-bills"><svg><use href="#i-key"/></svg></div><div class="meta"><b>Change password</b></div><svg style="width:16px;height:16px;color:var(--on-muted);transform:rotate(180deg)"><use href="#i-back"/></svg></div>
+                <div class="row"><div class="ic" style="background:color-mix(in oklab, #FF7B9D 18%, var(--surface-2));color:#FF7B9D"><svg><use href="#i-logout"/></svg></div><div class="meta"><b style="color:#FF7B9D">Log out</b></div></div>
+              </div>
+            </div>
+            <div class="tabbar">
+              <div class="tab"><svg><use href="#i-home"/></svg>Home</div>
+              <div class="tab"><svg><use href="#i-list"/></svg>Expenses</div>
+              <div class="tab"><svg><use href="#i-wallet"/></svg>Money</div>
+              <div class="tab"><svg><use href="#i-chart"/></svg>Insights</div>
+              <div class="tab active"><div class="indicator"></div><svg><use href="#i-user"/></svg>Profile</div>
+            </div>
+          </div></div>
+          <div class="cap"><span class="dot"></span><b>Dark</b> · Profile</div>
+        </div>
+        <div>
+          <div class="phone"><div class="screen light">
+            <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+            <div class="hero-panel">
+              <div class="topbar"><div></div><div class="icon-btn"><svg style="width:18px;height:18px;transform:rotate(90deg)"><use href="#i-list"/></svg></div></div>
+              <div class="display-lg" style="margin-top:6px">Profile</div>
+              <div style="display:flex;align-items:center;gap:14px;margin-top:18px">
+                <div style="width:56px;height:56px;border-radius:20px;background:var(--brand);color:var(--on-brand);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;letter-spacing:-0.04em">N</div>
+                <div><div style="font-weight:800;font-size:17px;letter-spacing:-0.02em">Nathan Solomon</div><div style="font-size:12px;color:var(--on-muted);font-weight:500">nathan@example.com · ✓ verified</div></div>
+              </div>
+            </div>
+            <div class="body">
+              <div class="dgroup">Preferences</div>
+              <div class="card tight">
+                <div class="row"><div class="ic cat-income"><svg><use href="#i-globe"/></svg></div><div class="meta"><b>Currency</b><span>ETB · Ethiopian birr</span></div><svg style="width:16px;height:16px;color:var(--on-muted);transform:rotate(180deg)"><use href="#i-back"/></svg></div>
+                <div class="row"><div class="ic cat-bills"><svg><use href="#i-eye"/></svg></div><div class="meta"><b>Hide amounts</b><span>Blur balances by default</span></div><div style="width:38px;height:22px;background:var(--surface-2);border-radius:99px;position:relative"><i style="position:absolute;width:16px;height:16px;border-radius:50%;background:var(--on-muted);top:3px;left:3px;display:block"></i></div></div>
+                <div class="row"><div class="ic cat-shop"><svg><use href="#i-sparkle"/></svg></div><div class="meta"><b>Gemini API key</b><span>For AI expense parsing</span></div><span class="chip-amt info">Set</span></div>
+              </div>
+              <div class="dgroup">Data</div>
+              <div class="card tight">
+                <div class="row"><div class="ic cat-fun"><svg><use href="#i-tag"/></svg></div><div class="meta"><b>Categories</b><span>9 default · 2 custom</span></div><svg style="width:16px;height:16px;color:var(--on-muted);transform:rotate(180deg)"><use href="#i-back"/></svg></div>
+                <div class="row"><div class="ic cat-transit"><svg><use href="#i-download"/></svg></div><div class="meta"><b>Export data</b><span>JSON · CSV</span></div><svg style="width:16px;height:16px;color:var(--on-muted);transform:rotate(180deg)"><use href="#i-back"/></svg></div>
+              </div>
+              <div class="dgroup">Account</div>
+              <div class="card tight">
+                <div class="row"><div class="ic cat-bills"><svg><use href="#i-key"/></svg></div><div class="meta"><b>Change password</b></div><svg style="width:16px;height:16px;color:var(--on-muted);transform:rotate(180deg)"><use href="#i-back"/></svg></div>
+                <div class="row"><div class="ic" style="background:color-mix(in oklab, #C73142 18%, var(--surface-2));color:#C73142"><svg><use href="#i-logout"/></svg></div><div class="meta"><b style="color:#C73142">Log out</b></div></div>
+              </div>
+            </div>
+            <div class="tabbar">
+              <div class="tab"><svg><use href="#i-home"/></svg>Home</div>
+              <div class="tab"><svg><use href="#i-list"/></svg>Expenses</div>
+              <div class="tab"><svg><use href="#i-wallet"/></svg>Money</div>
+              <div class="tab"><svg><use href="#i-chart"/></svg>Insights</div>
+              <div class="tab active"><div class="indicator"></div><svg><use href="#i-user"/></svg>Profile</div>
+            </div>
+          </div></div>
+          <div class="cap"><span class="dot light"></span><b>Light</b> · Profile</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PLATFORM SPLIT NAV ==================== -->
+<section class="group">
+  <h2>Platform-split bottom nav</h2>
+  <div class="grid">
+
+    <!-- iOS -->
+    <div>
+      <div class="phone"><div class="screen dark">
+        <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+        <div class="hero-panel brand"><div class="display-lg">Home</div><div style="font-size:13px;color:var(--on-muted);margin-top:6px">iOS · flat blurred tab bar, no center FAB</div></div>
+        <div class="body" style="opacity:.5;align-items:center;justify-content:center;display:flex"><div style="text-align:center;color:var(--on-muted);font-size:12px">— content —</div></div>
+        <div class="fab"><svg><use href="#i-plus"/></svg></div>
+        <div class="tabbar">
+          <div class="tab active"><div class="indicator"></div><svg><use href="#i-home"/></svg>Home</div>
+          <div class="tab"><svg><use href="#i-list"/></svg>Expenses</div>
+          <div class="tab"><svg><use href="#i-wallet"/></svg>Money</div>
+          <div class="tab"><svg><use href="#i-chart"/></svg>Insights</div>
+          <div class="tab"><svg><use href="#i-user"/></svg>Profile</div>
+        </div>
+      </div></div>
+      <div class="cap"><span class="dot"></span><b>iOS</b> · 5 flat tabs · FAB bottom-right</div>
+    </div>
+
+    <!-- Android -->
+    <div>
+      <div class="phone"><div class="screen dark">
+        <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+        <div class="hero-panel brand"><div class="display-lg">Home</div><div style="font-size:13px;color:var(--on-muted);margin-top:6px">Android · centered-FAB Material 3 nav</div></div>
+        <div class="body" style="opacity:.5;align-items:center;justify-content:center;display:flex"><div style="text-align:center;color:var(--on-muted);font-size:12px">— content —</div></div>
+        <div class="tabbar android">
+          <div class="tab active"><div class="indicator"></div><svg><use href="#i-home"/></svg>Home</div>
+          <div class="tab"><svg><use href="#i-list"/></svg>Expenses</div>
+          <div class="fab-slot"><svg><use href="#i-plus"/></svg></div>
+          <div class="tab"><svg><use href="#i-chart"/></svg>Insights</div>
+          <div class="tab"><svg><use href="#i-user"/></svg>Profile</div>
+        </div>
+      </div></div>
+      <div class="cap"><span class="dot"></span><b>Android</b> · 4 tabs + centered FAB</div>
+    </div>
+
+    <!-- iOS light -->
+    <div>
+      <div class="phone"><div class="screen light">
+        <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+        <div class="hero-panel brand"><div class="display-lg">Home</div><div style="font-size:13px;color:var(--on-muted);margin-top:6px">iOS light · same flat pattern</div></div>
+        <div class="body" style="opacity:.5;align-items:center;justify-content:center;display:flex"><div style="text-align:center;color:var(--on-muted);font-size:12px">— content —</div></div>
+        <div class="fab"><svg><use href="#i-plus"/></svg></div>
+        <div class="tabbar">
+          <div class="tab active"><div class="indicator"></div><svg><use href="#i-home"/></svg>Home</div>
+          <div class="tab"><svg><use href="#i-list"/></svg>Expenses</div>
+          <div class="tab"><svg><use href="#i-wallet"/></svg>Money</div>
+          <div class="tab"><svg><use href="#i-chart"/></svg>Insights</div>
+          <div class="tab"><svg><use href="#i-user"/></svg>Profile</div>
+        </div>
+      </div></div>
+      <div class="cap"><span class="dot light"></span><b>iOS</b> · light</div>
+    </div>
+
+    <!-- Android light -->
+    <div>
+      <div class="phone"><div class="screen light">
+        <div class="stat"><b>9:41</b><span class="r">5G ▮▮▮ 󰂄</span></div>
+        <div class="hero-panel brand"><div class="display-lg">Home</div><div style="font-size:13px;color:var(--on-muted);margin-top:6px">Android light · centered FAB</div></div>
+        <div class="body" style="opacity:.5;align-items:center;justify-content:center;display:flex"><div style="text-align:center;color:var(--on-muted);font-size:12px">— content —</div></div>
+        <div class="tabbar android">
+          <div class="tab active"><div class="indicator"></div><svg><use href="#i-home"/></svg>Home</div>
+          <div class="tab"><svg><use href="#i-list"/></svg>Expenses</div>
+          <div class="fab-slot"><svg><use href="#i-plus"/></svg></div>
+          <div class="tab"><svg><use href="#i-chart"/></svg>Insights</div>
+          <div class="tab"><svg><use href="#i-user"/></svg>Profile</div>
+        </div>
+      </div></div>
+      <div class="cap"><span class="dot light"></span><b>Android</b> · light</div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="foot">
+  Wireframes v2 · Plus Jakarta Sans · Wise green accent · Lucide line icons inline · 3D-blob placeholders mark spots for real custom illustration. Open in browser to compare side-by-side dark/light pairs.
+</footer>
+
+</body>
+</html>
