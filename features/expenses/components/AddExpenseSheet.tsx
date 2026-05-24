@@ -96,8 +96,12 @@ export function AddExpenseSheet({ visible, editing, onClose }: Props) {
     setErrors({});
     if (editing) {
       setAmount(String(editing.amount));
-      setCategoryId(editing.categoryId);
-      setSourceId(editing.moneySourceId);
+      // The backend's ExpenseDto excludes the raw foreign-key fields and only
+      // returns the nested `category` and `moneySource` objects. Read IDs
+      // through them and fall back to the (possibly undefined) raw fields
+      // for dev-stub responses.
+      setCategoryId(editing.category?.id ?? editing.categoryId ?? '');
+      setSourceId(editing.moneySource?.id ?? editing.moneySourceId ?? '');
       setDate(new Date(editing.date));
       setNotes(editing.notes ?? '');
     } else {

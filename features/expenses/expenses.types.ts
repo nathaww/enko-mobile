@@ -6,10 +6,17 @@ export type Expense = {
   amount: number;
   date: string;
   notes?: string;
-  categoryId: string;
+  /**
+   * Backend's ExpenseDto uses `@Exclude()` at class level and does NOT
+   * `@Expose()` the foreign-key fields. Only the nested `category` and
+   * `moneySource` objects come through. Read IDs via `expense.category.id`
+   * and `expense.moneySource.id` — these are guaranteed. The raw foreign
+   * keys below stay optional for dev stubs and future backend changes.
+   */
   category: Pick<Category, 'id' | 'name' | 'icon' | 'color'>;
-  moneySourceId: string;
   moneySource: Pick<MoneySource, 'id' | 'name' | 'icon' | 'currency'>;
+  categoryId?: string;
+  moneySourceId?: string;
   createdAt?: string;
   updatedAt?: string;
 };

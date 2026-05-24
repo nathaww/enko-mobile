@@ -1,8 +1,11 @@
+import { useEffect } from 'react';
+import { router } from 'expo-router';
 import {
   NativeTabs,
   Icon,
   Label,
 } from 'expo-router/unstable-native-tabs';
+import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
 import { typography } from '@/theme';
 
@@ -44,6 +47,20 @@ import { typography } from '@/theme';
  */
 export default function TabsLayout() {
   const theme = useTheme();
+  const { status } = useAuth();
+
+  // Hard auth guard: if the user becomes unauthenticated while inside (tabs)
+  // — typically right after a logout mutation completes — push them out so
+  // they can't navigate back into authenticated screens via the system back
+  // gesture. Render nothing during the transition so screens don't fire
+  // queries with no token.
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.replace('/(auth)/welcome');
+    }
+  }, [status]);
+
+  if (status !== 'authenticated') return null;
 
   return (
     <NativeTabs

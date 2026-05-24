@@ -6,6 +6,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { secureStorage } from '@/services/secureStorage';
 import { getMe } from '@/features/auth/auth-api';
 import type { AuthResponse, AuthUser } from '@/features/auth/auth.types';
@@ -28,6 +29,7 @@ export type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const queryClient = useQueryClient();
   const [status, setStatus] = useState<AuthStatus>('bootstrapping');
   const [user, setUser] = useState<AuthUser | null>(null);
   const [hasOnboarded, setHasOnboarded] = useState(false);
@@ -70,20 +72,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const signIn = useCallback(async (data: AuthResponse) => {
-    await secureStorage.saveSession({
-      accessToken: data.accessToken,
-      refreshToken: data.refreshToken,
-    });
-    setUser(data.user);
-    setStatus('authenticated');
-  }, []);
+  const signIn = useCallback(
+    async (data: AuthResponse) => {
+      await secureStorage.saveSession({
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      });
+      // Wipe every cached query so the new user starts on fresh data — no
+      // expenses, dashboard cards, or money sources from the previous session
+      // bleed through. Cheaper than invalidating individual feature keys and
+      // guarantees zero cross-user leakage.
+      queryClient.clear();
+      setUser(data.user);
+      setStatus('authenticated');
+    },
+    [queryClient]
+  );
 
   const signOut = useCallback(async () => {
     await secureStorage.clearSession();
+    queryClient.clear();
     setUser(null);
     setStatus('unauthenticated');
-  }, []);
+  }, [queryClient]);
 
   const completeOnboarding = useCallback(async () => {
     await secureStorage.markOnboardingComplete();
@@ -92,10 +103,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const reset = useCallback(async () => {
     await secureStorage.resetAll();
+    queryClient.clear();
     setUser(null);
     setHasOnboarded(false);
     setStatus('unauthenticated');
-  }, []);
+  }, [queryClient]);
 
   const value = useMemo<AuthContextValue>(
     () => ({

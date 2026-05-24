@@ -148,7 +148,12 @@ export async function listExpenses(filters: ExpenseFilters = {}): Promise<Expens
     );
   }
   // Backend wraps the list in PaginatedResponseDto: { data, hasMore, page, pageSize }.
-  // Unwrap so callers always get a plain Expense[] regardless of pagination.
+  // Filtering, search, and date ranges are all applied server-side via the
+  // QueryBuilder (verified end-to-end against the deployed API):
+  //   GET /expenses?filterField=categoryId&filterValue=<uuid>
+  // returns only matching rows, and an unrelated category id returns zero.
+  // We just unwrap the response and never filter client-side here —
+  // pagination would mask results and it's the backend's job anyway.
   const res = await api.get<PaginatedResponse<Expense> | Expense[]>('/expenses', {
     params: toBackendParams(filters),
   });
