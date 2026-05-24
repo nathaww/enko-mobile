@@ -36,6 +36,8 @@ export function CodeInput({ name, length = 6, autoFocus = true, onComplete }: Pr
   const handleChange = (text: string) => {
     const clean = text.replace(/[^0-9]/g, '').slice(0, length);
     helpers.setValue(clean);
+    // Clear stale error as the user edits (validateOnChange is off for perf).
+    if (meta.error) helpers.setError(undefined);
     if (clean.length === length) {
       helpers.setTouched(true, false);
       onComplete?.(clean);

@@ -10,6 +10,7 @@ import { spacing, typography } from '@/theme';
 import { zodValidate } from '@/utils/zodValidate';
 import { LoginSchema, type LoginValues } from './auth.schemas';
 import { useLoginMutation } from './auth.mutations';
+import { DevQuickSignIn } from './components/DevQuickSignIn';
 
 const initialValues: LoginValues = { email: '', password: '' };
 // Hoist the validator out of render so Formik gets a stable reference and
@@ -42,6 +43,12 @@ export function Login() {
                 loading={mutation.isPending}
                 disabled={!dirty || !isValid}
               />
+              {__DEV__ ? (
+                <DevQuickSignIn
+                  onSignIn={(email, password) => mutation.mutate({ email, password })}
+                  disabled={mutation.isPending}
+                />
+              ) : null}
               <View style={styles.bottomLink}>
                 <Text style={[typography.bodySm, { color: theme.colors.onSurfaceMuted }]}>
                   No account?{' '}

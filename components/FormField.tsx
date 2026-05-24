@@ -72,7 +72,12 @@ export function FormField({ name, label, rightAdornment, secureTextEntry, ...res
       <Animated.View style={[styles.wrap, animBorder]}>
         <Input
           value={field.value}
-          onChangeText={helpers.setValue}
+          onChangeText={(text) => {
+            helpers.setValue(text);
+            // Clear any stale error as the user types. Validation will rerun
+            // on blur/submit (validateOnChange is off for perf).
+            if (meta.error) helpers.setError(undefined);
+          }}
           onBlur={() => {
             helpers.setTouched(true);
             setFocused(false);

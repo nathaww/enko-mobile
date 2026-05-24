@@ -314,6 +314,19 @@ Formik re-renders all consumers on every keystroke because the context value is 
 
 For forms with > 10 fields or async validators, also consider Formik's `<FastField>` (skips re-render unless the specific field changed). If you ever need to move away from Formik for performance, `react-hook-form` is the suggested replacement — it uses uncontrolled inputs and doesn't re-render on every keystroke.
 
+### Stale errors when validateOnChange is off
+
+A side effect of `validateOnChange={false}`: an error set on blur sticks around even after the user starts editing. That feels like a bug ("I fixed it, why is the error still here?"). Solution: inputs that wrap Formik fields should clear `meta.error` as soon as the user types. `FormField` and `CodeInput` already do this in their `onChangeText` handlers:
+
+```tsx
+onChangeText={(text) => {
+  helpers.setValue(text);
+  if (meta.error) helpers.setError(undefined);
+}}
+```
+
+The next blur/submit will re-validate and surface the real (current) error if any.
+
 ## Auth & Session
 
 Auth state is held by `providers/AuthProvider.tsx` and consumed via `hooks/useAuth.ts`.

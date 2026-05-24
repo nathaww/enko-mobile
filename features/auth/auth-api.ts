@@ -73,14 +73,17 @@ export async function requestPasswordReset(
 
 export async function validatePasswordResetCode(
   data: VerifyCodeRequest
-): Promise<{ ok: true; resetToken: string }> {
+): Promise<{ valid: boolean }> {
   if (useDevStub) {
     await delay(500);
-    return { ok: true, resetToken: 'dev-reset' };
+    return { valid: true };
   }
-  const res = await api.post<{ ok: true; resetToken: string }>(
+  // Backend treats the 6-digit code as the reset token (both are stored under
+  // the same `password_reset:{X}` keyspace). It ignores the email — we keep
+  // it client-side only for UI display ("we sent a code to n••@example.com").
+  const res = await api.post<{ valid: boolean }>(
     '/auth/password-reset/validate',
-    data
+    { token: data.code },
   );
   return res.data;
 }
@@ -90,7 +93,10 @@ export async function resetPassword(data: ResetPasswordRequest): Promise<{ ok: t
     await delay(500);
     return { ok: true };
   }
-  const res = await api.post<{ ok: true }>('/auth/password-reset/reset', data);
+  const res = await api.post<{ ok: true }>('/auth/password-reset/reset', {
+    token: data.resetToken,
+    password: data.password,
+  });
   return res.data;
 }
 

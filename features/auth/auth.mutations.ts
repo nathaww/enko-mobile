@@ -107,15 +107,25 @@ export function useVerifyCodeMutation() {
   const toast = useToast();
   return useMutation({
     mutationFn: (data: VerifyCodeRequest) => validatePasswordResetCode(data),
-    onSuccess: () => {
+    onSuccess: (res, vars) => {
+      // Endpoint returns 200 with { valid: false } on bad codes (not an HTTP
+      // error), so the success path has to check the body.
+      if (!res.valid) {
+        toast('error', {
+          title: 'Invalid code',
+          description: 'Check the digits and try again.',
+        });
+        return;
+      }
       toast('success', { title: 'Code verified', description: 'Set a new password.' });
-      // TODO: route to reset-password screen when added
+      // TODO: route to reset-password screen with the code in params once that
+      // screen ships. For now, send the user back to login.
       router.replace('/(auth)/login');
     },
     onError: (err) => {
       toast('error', {
-        title: 'Invalid code',
-        description: extractMessage(err, 'Check the digits and try again.'),
+        title: 'Could not verify',
+        description: extractMessage(err, 'Please try again.'),
       });
     },
   });
