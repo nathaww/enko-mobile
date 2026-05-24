@@ -165,7 +165,7 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
     },
     content: {
       paddingHorizontal: spacing['2xl'],
-      paddingTop: spacing.xl,
+      paddingTop: spacing['3xl'],
       gap: spacing.lg,
     },
     actionsRow: {

@@ -235,10 +235,6 @@ function CardItem({
         { rotateZ: `${rot}deg` },
       ],
       opacity: slot > VISIBLE_DEPTH ? 0 : 1,
-      // Front card highest so it overlaps everything else.
-      zIndex: stackSize - slot,
-      // elevation is needed on Android for shadow + stacking.
-      elevation: stackSize - slot,
     };
   });
 
@@ -275,6 +271,13 @@ function CardItem({
   // composes them, gesture-handler picks the first to qualify.
   const gesture = Gesture.Race(pan, tap);
 
+  // z-order is keyed to the JS slot prop, NOT the animated slot value, so
+  // that on cycle the just-promoted card immediately sits above the just-
+  // demoted one. If z-order interpolated through the spring instead, the
+  // outgoing card would visibly remain on top while shrinking until the
+  // spring crossed the midpoint, which reads as "the front card is stuck".
+  const zIndex = stackSize - slotIndex;
+
   return (
     <GestureDetector gesture={gesture}>
       <Animated.View
@@ -284,6 +287,8 @@ function CardItem({
             width: cardWidth,
             height: cardHeight,
             backgroundColor: bgColor,
+            zIndex,
+            elevation: zIndex,
           },
           animatedStyle,
         ]}

@@ -104,20 +104,17 @@ export function Expenses() {
   const del = useDeleteExpense();
   const onDeleteRow = (expense: Expense) => del.mutate(expense.id);
 
+  const monthLabel = useMemo(
+    () => new Date().toLocaleDateString('en-US', { month: 'long' }),
+    []
+  );
+
   return (
     <View style={styles.root}>
-      <SafeAreaView edges={['top']} style={styles.headerWrap}>
-        <View style={styles.headerRow}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.title}>Expenses</Text>
-            <Text style={styles.subtitle}>
-              {expensesQ.isLoading
-                ? 'Loading…'
-                : periodTotal === 0
-                ? 'No expenses this period'
-                : `ETB ${formatAmount(periodTotal)} spent this period`}
-            </Text>
-          </View>
+      <SafeAreaView edges={['top']} style={styles.heroSafeTop} />
+      <View style={styles.hero}>
+        <View style={styles.topbar}>
+          <Text style={styles.title}>Expenses</Text>
           <Pressable
             onPress={() => router.push('/categories')}
             hitSlop={8}
@@ -127,14 +124,25 @@ export function Expenses() {
             <Settings2 size={20} color={theme.colors.onSurface} strokeWidth={2} />
           </Pressable>
         </View>
-      </SafeAreaView>
 
-      <View style={styles.filtersWrap}>
-        <FilterChips
-          categories={categoriesQ.data ?? []}
-          activeCategoryId={categoryFilter}
-          onChange={setCategoryFilter}
-        />
+        <View style={styles.totalRow}>
+          <Text style={styles.totalLabel}>{monthLabel} · Total</Text>
+          <Text style={styles.totalValue}>
+            {expensesQ.isLoading
+              ? '—'
+              : periodTotal === 0
+              ? 'ETB 0'
+              : `−ETB ${formatAmount(periodTotal)}`}
+          </Text>
+        </View>
+
+        <View style={styles.filtersWrap}>
+          <FilterChips
+            categories={categoriesQ.data ?? []}
+            activeCategoryId={categoryFilter}
+            onChange={setCategoryFilter}
+          />
+        </View>
       </View>
 
       <ScrollView
@@ -215,41 +223,57 @@ export function Expenses() {
 function makeStyles(theme: ReturnType<typeof useTheme>) {
   return StyleSheet.create({
     root: { flex: 1, backgroundColor: theme.colors.surface },
-    headerWrap: {
+    heroSafeTop: { backgroundColor: theme.colors.brandSoft },
+    hero: {
+      backgroundColor: theme.colors.brandSoft,
+      borderBottomLeftRadius: radii['5xl'],
+      borderBottomRightRadius: radii['5xl'],
       paddingHorizontal: spacing['2xl'],
       paddingTop: spacing.md,
-      paddingBottom: spacing.sm,
-      gap: spacing.xs,
-    },
-    headerRow: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      justifyContent: 'space-between',
+      paddingBottom: spacing.lg,
       gap: spacing.md,
     },
-    headerBtn: {
-      width: 40,
-      height: 40,
-      borderRadius: radii.md,
-      backgroundColor: theme.colors.surface1,
+    topbar: {
+      flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'center',
-      marginTop: spacing.xs,
+      justifyContent: 'space-between',
+      paddingBottom: spacing.xs,
     },
     title: {
-      ...typography.displayXL,
+      ...typography.displayLG,
       color: theme.colors.onSurface,
     },
-    subtitle: {
-      ...typography.body,
+    headerBtn: {
+      width: 38,
+      height: 38,
+      borderRadius: radii.md,
+      backgroundColor: theme.colors.surface2,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    totalRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      gap: spacing.sm,
+    },
+    totalLabel: {
+      ...typography.labelUp,
       color: theme.colors.onSurfaceMuted,
     },
+    totalValue: {
+      ...typography.titleMD,
+      color: theme.colors.onSurface,
+      fontFamily: typography.button.fontFamily,
+      fontSize: 18,
+      letterSpacing: -0.5,
+    },
     filtersWrap: {
+      marginHorizontal: -spacing['2xl'],
       paddingHorizontal: spacing['2xl'],
-      paddingVertical: spacing.md,
     },
     body: {
       paddingHorizontal: spacing['2xl'],
+      paddingTop: spacing.lg,
       paddingBottom: spacing['5xl'] + spacing['2xl'],
       gap: spacing.lg,
     },
