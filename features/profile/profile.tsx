@@ -24,6 +24,7 @@ import { Card } from '@/components/Card';
 import { ListItem } from '@/components/ListItem';
 import { Button } from '@/components/Button';
 import { AmountChip } from '@/components/AmountChip';
+import { SettingsSection } from '@/components/SettingsSection';
 import { useLogoutMutation } from '@/features/auth/auth.mutations';
 
 import { radii, spacing, typography } from '@/theme';
@@ -233,30 +234,6 @@ export function Profile() {
 // ──────────────────────────── Helpers ────────────────────────────
 
 type CategoryColorKey = 'food' | 'transit' | 'shop' | 'fun' | 'health' | 'bills' | 'income';
-
-function SettingsSection({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  const theme = useTheme();
-  return (
-    <View style={{ gap: spacing.sm }}>
-      <Text
-        style={{
-          ...typography.labelUp,
-          color: theme.colors.onSurfaceMuted,
-          paddingHorizontal: spacing.xs,
-        }}
-      >
-        {label}
-      </Text>
-      <Card variant="tight">{children}</Card>
-    </View>
-  );
-}
 
 function RowIcon({
   Icon,

@@ -54,6 +54,11 @@ export default function TabsLayout() {
         fontSize: 10,
         color: theme.colors.onSurfaceMuted,
       }}
+      // Without this, iOS uses a DIFFERENT appearance when scrolled to the
+      // top edge (transparent) vs while scrolling (translucent glass). The
+      // transition between the two causes a brief white/black flash. Keep
+      // one consistent appearance kills the flicker.
+      disableTransparentOnScrollEdge
     >
       <NativeTabs.Trigger name="index">
         <Icon

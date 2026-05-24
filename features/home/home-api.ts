@@ -1,4 +1,5 @@
 import { api } from '@/api/axios';
+import { unwrapPaginated, type PaginatedResponse } from '@/types/common';
 import type {
   DashboardOverview,
   DashboardTrends,
@@ -127,8 +128,10 @@ export async function getRecentExpenses(limit = 5): Promise<RecentExpense[]> {
     ];
     return stub.slice(0, limit);
   }
-  const res = await api.get<RecentExpense[]>('/expenses', {
-    params: { limit, sort: 'date:desc' },
-  });
-  return res.data;
+  // Backend wraps /expenses in PaginatedResponseDto.
+  const res = await api.get<PaginatedResponse<RecentExpense> | RecentExpense[]>(
+    '/expenses',
+    { params: { limit, sort: 'date:desc' } },
+  );
+  return unwrapPaginated(res.data);
 }

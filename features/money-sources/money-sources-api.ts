@@ -1,4 +1,5 @@
 import { api } from '@/api/axios';
+import { unwrapPaginated, type PaginatedResponse } from '@/types/common';
 import type { MoneySource } from './money-sources.types';
 
 const useDevStub = __DEV__ && !process.env.EXPO_PUBLIC_API_URL;
@@ -16,6 +17,7 @@ export async function listMoneySources(): Promise<MoneySource[]> {
       { id: 'awash', name: 'Awash', balance: 3000, currency: 'ETB', icon: '💳', isDefault: false, budget: 2000 },
     ];
   }
-  const res = await api.get<MoneySource[]>('/money-sources');
-  return res.data;
+  // Backend wraps the list in PaginatedResponseDto.
+  const res = await api.get<PaginatedResponse<MoneySource> | MoneySource[]>('/money-sources');
+  return unwrapPaginated(res.data);
 }

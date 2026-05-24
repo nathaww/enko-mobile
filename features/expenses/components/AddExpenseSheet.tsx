@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import { X, Trash2 } from 'lucide-react-native';
 
 import { Button } from '@/components/Button';
@@ -244,7 +245,19 @@ export function AddExpenseSheet({ visible, editing, onClose }: Props) {
             {!isEditing ? <AIParseField onParsed={onAIParsed} /> : null}
 
             <View style={styles.fieldBlock}>
-              <Text style={styles.fieldLabel}>Category</Text>
+              <View style={styles.fieldHeader}>
+                <Text style={styles.fieldLabel}>Category</Text>
+                <Pressable
+                  onPress={() => {
+                    onClose();
+                    router.push('/categories');
+                  }}
+                  hitSlop={6}
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.fieldLink}>Manage →</Text>
+                </Pressable>
+              </View>
               <PickerChips
                 options={
                   categoriesQ.data?.map((c) => ({
@@ -259,6 +272,12 @@ export function AddExpenseSheet({ visible, editing, onClose }: Props) {
                   setErrors((e) => ({ ...e, categoryId: undefined }));
                 }}
                 loading={categoriesQ.isLoading}
+                emptyText="No categories yet."
+                emptyActionLabel="Add"
+                onEmptyAction={() => {
+                  onClose();
+                  router.push('/categories');
+                }}
               />
               {errors.categoryId ? <Text style={styles.error}>{errors.categoryId}</Text> : null}
             </View>
@@ -279,6 +298,12 @@ export function AddExpenseSheet({ visible, editing, onClose }: Props) {
                   setErrors((e) => ({ ...e, moneySourceId: undefined }));
                 }}
                 loading={sourcesQ.isLoading}
+                emptyText="No money sources yet."
+                emptyActionLabel="Add"
+                onEmptyAction={() => {
+                  // TODO: route to money-sources management when that screen ships
+                  onClose();
+                }}
               />
               {errors.moneySourceId ? (
                 <Text style={styles.error}>{errors.moneySourceId}</Text>
@@ -354,10 +379,21 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
       gap: spacing.xl,
     },
     fieldBlock: { gap: spacing.sm },
+    fieldHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.xs,
+    },
     fieldLabel: {
       ...typography.labelUp,
       color: theme.colors.onSurfaceMuted,
       paddingHorizontal: spacing.xs,
+    },
+    fieldLink: {
+      ...typography.bodySm,
+      color: theme.colors.brand,
+      fontFamily: typography.button.fontFamily,
     },
     notesInput: {
       backgroundColor: theme.colors.surface2,

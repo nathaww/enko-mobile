@@ -30,7 +30,7 @@ export function HomeHeader({
     <View style={styles.row}>
       <View>
         <Text style={styles.greeting}>{greeting},</Text>
-        <Text style={styles.name}>{name}.</Text>
+        <Text style={styles.name}>{name}</Text>
       </View>
       <View style={styles.actions}>
         <IconButton onPress={onPressNotifications} showDot={hasUnreadNotifications}>

@@ -1,4 +1,5 @@
 import { api } from '@/api/axios';
+import { unwrapPaginated, type PaginatedResponse } from '@/types/common';
 import type {
   CreateExpenseRequest,
   Expense,
@@ -94,6 +95,38 @@ function buildStubExpense(data: CreateExpenseRequest): Expense {
   };
 }
 
+/**
+ * Translate UI-friendly filter shape into the backend's PaginatedRequestDto
+ * params. Backend uses a generic `filterField` + `filterValue` for equality
+ * (only one at a time), `search` for text, and `dateField` + `startDate` /
+ * `endDate` for date ranges. The UI keeps the friendlier { categoryId, ... }
+ * shape so feature code doesn't have to know about backend quirks.
+ *
+ * Limitation: backend supports ONE filterField at a time. If both a category
+ * and a money-source filter are set, we prioritize category.
+ */
+function toBackendParams(filters: ExpenseFilters): Record<string, string> {
+  const params: Record<string, string> = {};
+
+  if (filters.search) params.search = filters.search;
+
+  if (filters.categoryId) {
+    params.filterField = 'categoryId';
+    params.filterValue = filters.categoryId;
+  } else if (filters.moneySourceId) {
+    params.filterField = 'moneySourceId';
+    params.filterValue = filters.moneySourceId;
+  }
+
+  if (filters.fromDate || filters.toDate) {
+    params.dateField = 'date';
+    if (filters.fromDate) params.startDate = filters.fromDate;
+    if (filters.toDate) params.endDate = filters.toDate;
+  }
+
+  return params;
+}
+
 export async function listExpenses(filters: ExpenseFilters = {}): Promise<Expense[]> {
   if (useDevStub) {
     await delay(180);
@@ -114,8 +147,12 @@ export async function listExpenses(filters: ExpenseFilters = {}): Promise<Expens
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
   }
-  const res = await api.get<Expense[]>('/expenses', { params: filters });
-  return res.data;
+  // Backend wraps the list in PaginatedResponseDto: { data, hasMore, page, pageSize }.
+  // Unwrap so callers always get a plain Expense[] regardless of pagination.
+  const res = await api.get<PaginatedResponse<Expense> | Expense[]>('/expenses', {
+    params: toBackendParams(filters),
+  });
+  return unwrapPaginated(res.data);
 }
 
 export async function getExpense(id: string): Promise<Expense> {

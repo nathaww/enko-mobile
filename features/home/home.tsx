@@ -73,7 +73,7 @@ export function Home() {
     await queryClient.invalidateQueries({ queryKey: homeQueryKeys.all() });
   };
 
-  const firstName = user?.name?.trim().split(/\s+/)[0] ?? 'there';
+  const firstName = user?.name?.trim().split(/\s+/)[0] ?? 'Broski';
   const greeting = greetingForTimeOfDay();
 
   const trendsPoints =
