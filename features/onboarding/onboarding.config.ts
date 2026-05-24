@@ -4,13 +4,13 @@ export const SLIDES: OnboardingSlideData[] = [
   {
     title: 'Track every birr.',
     description:
-      'Log expenses in seconds. Group them by category, source, and date — Enko sorts the rest.',
+      'Log expenses in seconds. Group them by category, source, and date. Enko sorts the rest.',
     lottie: 'track',
   },
   {
     title: 'Just describe it.',
     description:
-      'Type or speak what you spent — our AI parses the amount, category, and account automatically.',
+      'Type or speak what you spent. Our AI parses the amount, category, and account automatically.',
     lottie: 'textToSpeech',
   },
   {

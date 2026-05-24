@@ -6,7 +6,12 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "ios:pods": "cd ios && pod install",
+    "android:gradle": "cd android && ./gradlew clean",
+    "ios:rebuild": "pnpm ios:pods && expo run:ios",
+    "android:rebuild": "pnpm android:gradle && expo run:android",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@expo-google-fonts/plus-jakarta-sans": "^0.4.2",
@@ -21,6 +26,7 @@
     "expo-haptics": "~15.0.8",
     "expo-linking": "~8.0.11",
     "expo-router": "~6.0.23",
+    "expo-secure-store": "~15.0.8",
     "expo-splash-screen": "~31.0.13",
     "expo-status-bar": "~3.0.9",
     "expo-web-browser": "~15.0.10",

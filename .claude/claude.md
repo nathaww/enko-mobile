@@ -238,6 +238,98 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
 ### When `useMemo(makeStyles)` becomes painful
 If a component re-renders frequently and `makeStyles` shows up in profiling, hoist the static parts outside and only theme-dependent values inside. We can introduce Unistyles later if perf demands it — not before.
 
+## Scripts
+
+```bash
+pnpm start             # metro dev server
+pnpm ios               # build + run iOS (after pods are synced)
+pnpm android           # build + run Android
+pnpm ios:pods          # sync CocoaPods only
+pnpm android:gradle    # clean Android gradle cache
+pnpm ios:rebuild       # ios:pods + run:ios  (use after adding a native dep)
+pnpm android:rebuild   # gradle clean + run:android
+pnpm typecheck         # tsc --noEmit
+```
+
+**After installing any native module** (`expo-*`, `react-native-*` with native code) run `pnpm ios:rebuild` / `pnpm android:rebuild`. Metro reload alone is not enough; native modules need to be compiled into the binary. Symptom of skipping this: `Cannot find native module 'X'` at runtime.
+
+## Reusability Rule (no copy-paste)
+
+If a value, style, piece of UI, or behavior is used more than once, extract it into a shared primitive. Do not copy-paste. Do not wait for the "third strike" — by then the two callsites have already drifted apart.
+
+- **UI used twice → component.** Lives in `components/` if used across features, in `features/<x>/components/` if scoped to one feature.
+- **Behavior used twice → hook.** Lives in `hooks/` if shared, `features/<x>/hooks/` if scoped.
+- **Style pattern used twice → extracted into a primitive component** (so the styling is set in one place and consumers compose them). Don't share style objects across feature code; share components that own the style.
+- **Pure function used twice → util** in `utils/`.
+- **Token (color, radius, spacing, font) used anywhere → must come from `theme/`.** Never hardcode `#9FE870` or `padding: 16` in a feature file.
+
+### Worked example
+
+We hit an iOS bug where `TextInput` clips descenders when `lineHeight` is set explicitly + the field is focused. The fix is a specific style combo (`fontFamily` + `fontSize` only, no `lineHeight`; `includeFontPadding: false`; `textAlignVertical: 'center'`). Rather than re-apply this in every input, we extract `<Input>` in `components/Input.tsx` and **every visible text input in the app uses it** — feature code never reaches for a bare `<TextInput>`.
+
+The signal: if you find yourself copying a style block, *stop and extract first*. The refactor is always cheaper now than after three callsites have drifted.
+
+## Copywriting Rules
+
+- **Never use em-dashes (—) in user-facing text.** This applies to button labels, screen copy, toast titles/descriptions, error messages, onboarding slides, validation messages — anywhere a user might read the text. Use a period and a new sentence, a comma, or restructure. Comments in code are also no em-dash for consistency.
+  - Bad: `"Track every birr — Enko sorts the rest."`
+  - Good: `"Track every birr. Enko sorts the rest."`
+- Sentence case for buttons and section headers (`Sign in`, not `Sign In`).
+- Prefer simple, concrete words: `Track`, `See`, `Add`, not `Capture`, `Visualize`, `Create`.
+- Toast titles are short imperatives or status (`Welcome back`, `Code sent`, `Sign in failed`). Description holds detail.
+
+## Environment
+
+API URL is configured via `EXPO_PUBLIC_API_URL` in `.env.local`. Anything prefixed with `EXPO_PUBLIC_` gets inlined at build time and is readable from JS via `process.env.EXPO_PUBLIC_API_URL`. **Restart metro after editing `.env.local`** (changes don't hot-reload).
+
+Current deployed backend: `https://expense-tracker-backend-tawny-eight.vercel.app` — Swagger docs at `/api/docs-json`. **Note:** the `/api` prefix is *only* on the docs route. Actual endpoints live at the root, e.g. `POST /auth/login` (not `/api/auth/login`). The axios `baseURL` in `api/axios.ts` is set to the host without `/api`.
+
+When `EXPO_PUBLIC_API_URL` is unset, `auth-api.ts` falls back to in-memory dev stubs so the UI is browsable without a backend. With it set, real calls go through.
+
+## Form Performance
+
+Formik re-renders all consumers on every keystroke because the context value is the whole formik state. Combined with Zod validation, naive setups lag visibly when users hold backspace. **Two rules** make every form fast enough without leaving Formik:
+
+1. **Hoist validators out of render.** Define them at module scope, not inline:
+   ```ts
+   // ✅ good — single stable reference
+   const validateLogin = zodValidate(LoginSchema);
+   export function Login() {
+     return <Formik validate={validateLogin} ...>;
+   }
+
+   // ❌ bad — new fn every render, Zod schema re-bound
+   <Formik validate={zodValidate(LoginSchema)} ...>
+   ```
+
+2. **Validate on blur, not on change.** Default `validateOnChange={true}` means Zod parses the whole schema on every keystroke. Switch to `validateOnChange={false}` + `validateOnBlur` so validation runs only when a field loses focus (and on submit). This is also a friendlier UX — no shouting at users mid-typing.
+   ```tsx
+   <Formik
+     validate={validateLogin}
+     validateOnChange={false}
+     validateOnBlur
+     onSubmit={...}
+   />
+   ```
+
+For forms with > 10 fields or async validators, also consider Formik's `<FastField>` (skips re-render unless the specific field changed). If you ever need to move away from Formik for performance, `react-hook-form` is the suggested replacement — it uses uncontrolled inputs and doesn't re-render on every keystroke.
+
+## Auth & Session
+
+Auth state is held by `providers/AuthProvider.tsx` and consumed via `hooks/useAuth.ts`.
+
+- **Storage** — tokens live in `expo-secure-store` (iOS Keychain, Android Keystore). Wrapper at `services/secureStorage.ts`. Never touch SecureStore directly from feature code.
+- **Bootstrap** — on mount, AuthProvider reads `accessToken` + `onboardingComplete` flag from secure storage and either authenticates or marks unauthenticated. Splash stays up until bootstrap completes.
+- **Sign in / register** — auth mutations call `useAuth().signIn(authResponse)` which persists tokens AND updates context. Routes navigate to `/(tabs)` after.
+- **Sign out** — `useAuth().signOut()` clears storage, resets context, navigates to `/(auth)/welcome`.
+- **Onboarding flag** — `useAuth().completeOnboarding()` flips a persisted boolean so users see it only once.
+- **Axios** — request interceptor pulls the access token from secure store on every call. Response interceptor handles 401 (refresh-or-logout, currently a TODO).
+- **App entry decision** — `app/index.tsx` reads `useAuth()` and redirects:
+  - bootstrapping → `null` (splash still up)
+  - authenticated → `/(tabs)`
+  - not onboarded → `/(onboarding)`
+  - onboarded + signed out → `/(auth)/welcome`
+
 ## Global Components
 
 - Put reusable UI in `components/` at root.

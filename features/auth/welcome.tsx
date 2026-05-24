@@ -17,7 +17,7 @@ export function Welcome() {
         <Image source={heroIllustrations.onboarding} style={styles.heroImg} resizeMode="contain" />
         <Text style={styles.title}>Welcome to Enko.</Text>
         <Text style={styles.subtitle}>
-          Track expenses, manage accounts, and stay on budget — in one quiet, beautiful place.
+          Track expenses, manage accounts, and stay on budget. All in one quiet, beautiful place.
         </Text>
       </View>
 

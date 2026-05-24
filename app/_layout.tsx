@@ -6,7 +6,7 @@ import {
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -21,6 +21,7 @@ import {
 
 import { AppProviders } from '@/providers/AppProviders';
 import { useThemeContext } from '@/providers/ThemeProvider';
+import { useAuth } from '@/hooks/useAuth';
 import { setupInterceptors } from '@/api/interceptors';
 import { AppToast } from '@/components/Toast';
 
@@ -42,19 +43,34 @@ export default function RootLayout() {
     if (error) throw error;
   }, [error]);
 
-  useEffect(() => {
-    if (loaded) SplashScreen.hideAsync();
-  }, [loaded]);
-
+  // Fonts must load before any UI renders. Splash hides inside BootstrapGate
+  // once auth bootstrap also resolves, so the user never sees half-styled text.
   if (!loaded) return null;
 
   return (
     <SafeAreaProvider>
       <AppProviders>
-        <RootLayoutNav />
+        <BootstrapGate>
+          <RootLayoutNav />
+        </BootstrapGate>
       </AppProviders>
     </SafeAreaProvider>
   );
+}
+
+function BootstrapGate({ children }: { children: React.ReactNode }) {
+  const { isBootstrapping } = useAuth();
+
+  useEffect(() => {
+    if (!isBootstrapping) {
+      SplashScreen.hideAsync().catch(() => {
+        // Ignore: splash may already be hidden on hot-reload.
+      });
+    }
+  }, [isBootstrapping]);
+
+  if (isBootstrapping) return null;
+  return <>{children}</>;
 }
 
 function RootLayoutNav() {

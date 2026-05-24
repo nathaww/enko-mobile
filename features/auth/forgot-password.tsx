@@ -8,6 +8,7 @@ import { ForgotPasswordSchema, type ForgotPasswordValues } from './auth.schemas'
 import { useForgotPasswordMutation } from './auth.mutations';
 
 const initialValues: ForgotPasswordValues = { email: '' };
+const validateForgotPassword = zodValidate(ForgotPasswordSchema);
 
 export function ForgotPassword() {
   const mutation = useForgotPasswordMutation();
@@ -15,7 +16,9 @@ export function ForgotPassword() {
   return (
     <Formik
       initialValues={initialValues}
-      validate={zodValidate(ForgotPasswordSchema)}
+      validate={validateForgotPassword}
+      validateOnChange={false}
+      validateOnBlur
       onSubmit={(values) => mutation.mutate(values)}
     >
       {({ handleSubmit, isValid, dirty }) => (

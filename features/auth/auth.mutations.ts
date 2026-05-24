@@ -1,12 +1,14 @@
 import { useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useToast } from '@/hooks/useToast';
+import { useAuth } from '@/hooks/useAuth';
 import {
   loginUser,
   registerUser,
   requestPasswordReset,
   validatePasswordResetCode,
   verifyEmail,
+  logoutUser,
 } from './auth-api';
 import type {
   ForgotPasswordRequest,
@@ -25,9 +27,11 @@ function extractMessage(err: unknown, fallback: string): string {
 
 export function useLoginMutation() {
   const toast = useToast();
+  const { signIn } = useAuth();
   return useMutation({
     mutationFn: (data: LoginRequest) => loginUser(data),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      await signIn(data);
       toast('success', { title: `Welcome back, ${data.user.name.split(' ')[0]}` });
       router.replace('/(tabs)');
     },
@@ -42,9 +46,11 @@ export function useLoginMutation() {
 
 export function useRegisterMutation() {
   const toast = useToast();
+  const { signIn } = useAuth();
   return useMutation({
     mutationFn: (data: RegisterRequest) => registerUser(data),
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      await signIn(data);
       toast('success', { title: 'Account created', description: 'You are signed in.' });
       router.replace('/(tabs)');
     },
@@ -53,6 +59,23 @@ export function useRegisterMutation() {
         title: 'Could not create account',
         description: extractMessage(err, 'Please try again.'),
       });
+    },
+  });
+}
+
+export function useLogoutMutation() {
+  const toast = useToast();
+  const { signOut } = useAuth();
+  return useMutation({
+    mutationFn: () => logoutUser(),
+    onSettled: async () => {
+      // Clear local session even if the server call failed; the token is
+      // already invalid client-side once the user taps logout.
+      await signOut();
+      router.replace('/(auth)/welcome');
+    },
+    onSuccess: () => {
+      toast('info', { title: 'Signed out' });
     },
   });
 }

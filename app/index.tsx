@@ -1,14 +1,19 @@
 import { Redirect } from 'expo-router';
+import { useAuth } from '@/hooks/useAuth';
 
 /**
- * App entry. Decides where to send the user.
+ * App entry. Picks the right starting route from auth + onboarding state.
  *
- * For now (no persisted auth state yet) we always send to onboarding.
- * Once auth + secure storage land, this checks for a token and either:
- *   - Redirects to /(tabs) if signed in
- *   - Redirects to /(auth)/welcome if onboarded but signed out
- *   - Redirects to /(onboarding) for first-launch users
+ *   bootstrapping → render nothing (splash is still up via AuthProvider)
+ *   authenticated → /(tabs)
+ *   not onboarded → /(onboarding)
+ *   onboarded + signed out → /(auth)/welcome
  */
 export default function Index() {
-  return <Redirect href="/(onboarding)" />;
+  const { status, hasOnboarded } = useAuth();
+
+  if (status === 'bootstrapping') return null;
+  if (status === 'authenticated') return <Redirect href="/(tabs)" />;
+  if (!hasOnboarded) return <Redirect href="/(onboarding)" />;
+  return <Redirect href="/(auth)/welcome" />;
 }

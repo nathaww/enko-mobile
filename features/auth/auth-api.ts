@@ -28,6 +28,7 @@ function mockAuthResponse(email: string, name = 'Nathan'): AuthResponse {
       id: 'dev-user',
       name,
       email,
+      isActive: true,
       isVerified: true,
     },
   };

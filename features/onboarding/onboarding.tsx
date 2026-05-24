@@ -22,6 +22,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/components/Button';
 import { useTheme } from '@/hooks/useTheme';
 import { useHaptic } from '@/hooks/useHaptic';
+import { useAuth } from '@/hooks/useAuth';
 import { spacing, typography } from '@/theme';
 
 import { SLIDES } from './onboarding.config';
@@ -32,6 +33,7 @@ import { ParallaxBackground } from './components/ParallaxBackground';
 export function Onboarding() {
   const theme = useTheme();
   const haptic = useHaptic();
+  const { completeOnboarding } = useAuth();
   const { width } = useWindowDimensions();
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
@@ -66,20 +68,22 @@ export function Onboarding() {
     [width]
   );
 
-  const onNext = useCallback(() => {
+  const onNext = useCallback(async () => {
     const current = Math.round(scrollX.value / width);
     if (current >= SLIDES.length - 1) {
       haptic('medium');
+      await completeOnboarding();
       router.replace('/(auth)/welcome');
     } else {
       goToTab(current + 1);
     }
-  }, [width, scrollX, haptic, goToTab]);
+  }, [width, scrollX, haptic, goToTab, completeOnboarding]);
 
-  const onSkip = useCallback(() => {
+  const onSkip = useCallback(async () => {
     haptic('light');
+    await completeOnboarding();
     router.replace('/(auth)/welcome');
-  }, [haptic]);
+  }, [haptic, completeOnboarding]);
 
   return (
     <View style={styles.root}>

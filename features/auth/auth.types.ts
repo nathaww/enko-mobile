@@ -2,7 +2,9 @@ export type AuthUser = {
   id: string;
   name: string;
   email: string;
+  isActive: boolean;
   isVerified: boolean;
+  /** Returned by /users endpoints, not by /auth/login. Optional. */
   profilePicture?: string | null;
 };
 

@@ -1,15 +1,17 @@
 import { api } from './axios';
+import { secureStorage } from '@/services/secureStorage';
 
 /**
- * Wire up auth tokens, error normalization, and toast notifications.
- * Call this once from AppProviders before the app renders.
- *
- * Stubbed out for now — fill in once auth + toast are in place.
+ * Wire request + response interceptors. Called once from _layout before
+ * anything renders so every API call carries the auth header.
  */
 export function setupInterceptors() {
   api.interceptors.request.use(
-    (config) => {
-      // TODO: attach JWT from secure storage
+    async (config) => {
+      const token = await secureStorage.getAccessToken();
+      if (token) {
+        config.headers.set('Authorization', `Bearer ${token}`);
+      }
       return config;
     },
     (error) => Promise.reject(error)
@@ -17,8 +19,11 @@ export function setupInterceptors() {
 
   api.interceptors.response.use(
     (response) => response,
-    (error) => {
-      // TODO: normalize error shape, surface toast on 5xx, refresh-token on 401
+    async (error) => {
+      // TODO: on 401, call /auth/refresh-access-token with refreshToken,
+      // retry the original request once. If refresh fails, clear session.
+      // Keeping this a single-shot reject for now so failures surface clearly
+      // in toasts during early development.
       return Promise.reject(error);
     }
   );

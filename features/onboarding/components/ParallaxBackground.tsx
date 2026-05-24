@@ -38,7 +38,7 @@ export function ParallaxBackground({ scrollX, width, count }: Props) {
     ],
   }));
 
-  // Tiny accent blob, bottom — gentle drift
+  // Tiny accent blob, bottom. Gentle drift.
   const blobC = useAnimatedStyle(() => ({
     transform: [
       { translateX: interpolate(scrollX.value, [0, totalScroll], [width * 0.3, width * 0.6]) },

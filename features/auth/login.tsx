@@ -12,6 +12,9 @@ import { LoginSchema, type LoginValues } from './auth.schemas';
 import { useLoginMutation } from './auth.mutations';
 
 const initialValues: LoginValues = { email: '', password: '' };
+// Hoist the validator out of render so Formik gets a stable reference and
+// the Zod schema isn't reconstructed every keystroke. See CLAUDE.md "Form perf".
+const validateLogin = zodValidate(LoginSchema);
 
 export function Login() {
   const theme = useTheme();
@@ -20,7 +23,9 @@ export function Login() {
   return (
     <Formik
       initialValues={initialValues}
-      validate={zodValidate(LoginSchema)}
+      validate={validateLogin}
+      validateOnChange={false}
+      validateOnBlur
       onSubmit={(values) => mutation.mutate(values)}
     >
       {({ handleSubmit, isValid, dirty }) => (

@@ -1,18 +1,19 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Pressable,
   StyleSheet,
   Text,
-  TextInput,
   View,
   type TextInputProps,
 } from 'react-native';
 import Animated, {
+  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 import { useField } from 'formik';
+import { Input } from './Input';
 import { useTheme } from '@/hooks/useTheme';
 import { radii, spacing, typography } from '@/theme';
 
@@ -25,7 +26,8 @@ type Props = Omit<TextInputProps, 'value' | 'onChangeText' | 'onBlur'> & {
 };
 
 /**
- * Formik-aware text field with themed styling and inline error display.
+ * Formik-aware text field. Composes <Input> (themed primitive) with a label,
+ * an animated bordered wrapper, and inline error text.
  *
  *   <FormField name="email" label="Email" keyboardType="email-address" />
  *
@@ -41,24 +43,34 @@ export function FormField({ name, label, rightAdornment, secureTextEntry, ...res
   const hasError = meta.touched && !!meta.error;
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
-  // Animated border color: outline → brand on focus → error on invalid
-  const borderProgress = useSharedValue(0);
+  // Animated border color: resting outline → brand on focus → error red on invalid.
+  // Writes happen in effects (not during render) to satisfy Reanimated strict mode.
+  const focusProgress = useSharedValue(0);
   const errorProgress = useSharedValue(0);
-  borderProgress.value = withTiming(focused ? 1 : 0, { duration: 160 });
-  errorProgress.value = withTiming(hasError ? 1 : 0, { duration: 160 });
+
+  useEffect(() => {
+    focusProgress.value = withTiming(focused ? 1 : 0, { duration: 160 });
+  }, [focused, focusProgress]);
+
+  useEffect(() => {
+    errorProgress.value = withTiming(hasError ? 1 : 0, { duration: 160 });
+  }, [hasError, errorProgress]);
+
+  const restColor = theme.colors.outlineSoft;
+  const focusColor = theme.colors.brand;
+  const errorColor = theme.colors.chipNegOn;
 
   const animBorder = useAnimatedStyle(() => {
-    const focusColor = focused ? theme.colors.brand : theme.colors.outlineSoft;
-    return {
-      borderColor: hasError ? theme.colors.chipNegOn : focusColor,
-    };
+    const focused = interpolateColor(focusProgress.value, [0, 1], [restColor, focusColor]);
+    const withError = interpolateColor(errorProgress.value, [0, 1], [focused, errorColor]);
+    return { borderColor: withError };
   });
 
   return (
     <View style={styles.root}>
       <Text style={styles.label}>{label}</Text>
       <Animated.View style={[styles.wrap, animBorder]}>
-        <TextInput
+        <Input
           value={field.value}
           onChangeText={helpers.setValue}
           onBlur={() => {
@@ -66,9 +78,8 @@ export function FormField({ name, label, rightAdornment, secureTextEntry, ...res
             setFocused(false);
           }}
           onFocus={() => setFocused(true)}
-          placeholderTextColor={theme.colors.onSurfaceDim}
-          style={styles.input}
           secureTextEntry={hidden}
+          style={styles.inputSlot}
           {...rest}
         />
         {secureTextEntry ? (
@@ -102,11 +113,8 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
       borderWidth: 1.5,
       paddingHorizontal: spacing.md,
     },
-    input: {
+    inputSlot: {
       flex: 1,
-      ...typography.body,
-      color: theme.colors.onSurface,
-      paddingVertical: spacing.md + 2,
     },
     adornment: {
       paddingLeft: spacing.sm,

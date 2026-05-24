@@ -14,6 +14,7 @@ import { useVerifyCodeMutation } from './auth.mutations';
 import { requestPasswordReset } from './auth-api';
 
 const initialValues: VerifyCodeValues = { code: '' };
+const validateVerifyCode = zodValidate(VerifyCodeSchema);
 
 export function VerifyCode() {
   const theme = useTheme();
@@ -50,7 +51,9 @@ export function VerifyCode() {
   return (
     <Formik
       initialValues={initialValues}
-      validate={zodValidate(VerifyCodeSchema)}
+      validate={validateVerifyCode}
+      validateOnChange={false}
+      validateOnBlur
       onSubmit={(values) => mutation.mutate({ email, code: values.code })}
     >
       {({ handleSubmit, isValid, values, setFieldValue }) => (

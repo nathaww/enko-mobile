@@ -12,6 +12,7 @@ import { RegisterSchema, type RegisterValues } from './auth.schemas';
 import { useRegisterMutation } from './auth.mutations';
 
 const initialValues: RegisterValues = { name: '', email: '', password: '' };
+const validateRegister = zodValidate(RegisterSchema);
 
 export function Register() {
   const theme = useTheme();
@@ -20,7 +21,9 @@ export function Register() {
   return (
     <Formik
       initialValues={initialValues}
-      validate={zodValidate(RegisterSchema)}
+      validate={validateRegister}
+      validateOnChange={false}
+      validateOnBlur
       onSubmit={(values) => mutation.mutate(values)}
     >
       {({ handleSubmit, isValid, dirty }) => (
