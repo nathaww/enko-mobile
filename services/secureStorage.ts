@@ -4,7 +4,10 @@ const KEYS = {
   accessToken: 'enko.accessToken',
   refreshToken: 'enko.refreshToken',
   onboardingComplete: 'enko.onboardingComplete',
+  themeOverride: 'enko.themeOverride',
 } as const;
+
+type ThemeOverride = 'light' | 'dark';
 
 export type StoredSession = {
   accessToken: string;
@@ -59,12 +62,26 @@ export const secureStorage = {
     return v === '1';
   },
 
+  async saveThemeOverride(mode: ThemeOverride | null): Promise<void> {
+    if (mode === null) {
+      await SecureStore.deleteItemAsync(KEYS.themeOverride);
+    } else {
+      await SecureStore.setItemAsync(KEYS.themeOverride, mode);
+    }
+  },
+
+  async loadThemeOverride(): Promise<ThemeOverride | null> {
+    const v = await SecureStore.getItemAsync(KEYS.themeOverride);
+    return v === 'light' || v === 'dark' ? v : null;
+  },
+
   /** Debug-only: wipe everything. Useful in dev menus. */
   async resetAll(): Promise<void> {
     await Promise.all([
       SecureStore.deleteItemAsync(KEYS.accessToken),
       SecureStore.deleteItemAsync(KEYS.refreshToken),
       SecureStore.deleteItemAsync(KEYS.onboardingComplete),
+      SecureStore.deleteItemAsync(KEYS.themeOverride),
     ]);
   },
 };

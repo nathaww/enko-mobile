@@ -1,23 +1,68 @@
 import React, { useMemo } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Alert } from 'react-native';
+import {
+  ChevronRight,
+  Globe,
+  Eye,
+  Sparkles,
+  Sun,
+  Tag,
+  DollarSign,
+  Download,
+  Upload,
+  KeyRound,
+  type LucideIcon,
+} from 'lucide-react-native';
+
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
+import { useThemeContext } from '@/providers/ThemeProvider';
+import { useToast } from '@/hooks/useToast';
+
+import { Card } from '@/components/Card';
+import { ListItem } from '@/components/ListItem';
 import { Button } from '@/components/Button';
+import { AmountChip } from '@/components/AmountChip';
 import { useLogoutMutation } from '@/features/auth/auth.mutations';
+
 import { radii, spacing, typography } from '@/theme';
 
-/**
- * Profile tab. Shows the signed-in user's identity and a Log out action.
- * Settings sections (currency, theme, categories, data export) live here
- * eventually; for now we ship the auth-critical chrome and the logout flow.
- */
 export function Profile() {
   const theme = useTheme();
   const { user } = useAuth();
+  const { override, setOverride } = useThemeContext();
+  const toast = useToast();
   const logout = useLogoutMutation();
+  const [hideAmounts, setHideAmounts] = React.useState(false);
+
   const styles = useMemo(() => makeStyles(theme), [theme]);
+
+  const themeLabel: 'System' | 'Light' | 'Dark' =
+    override === 'light' ? 'Light' : override === 'dark' ? 'Dark' : 'System';
+
+  const pickTheme = () => {
+    Alert.alert(
+      'Theme',
+      'Choose how Enko looks.',
+      [
+        {
+          text: themeLabel === 'System' ? '✓ System' : 'System',
+          onPress: () => setOverride(null),
+        },
+        {
+          text: themeLabel === 'Light' ? '✓ Light' : 'Light',
+          onPress: () => setOverride('light'),
+        },
+        {
+          text: themeLabel === 'Dark' ? '✓ Dark' : 'Dark',
+          onPress: () => setOverride('dark'),
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ],
+      { cancelable: true }
+    );
+  };
 
   const confirmLogout = () => {
     Alert.alert(
@@ -35,6 +80,9 @@ export function Profile() {
     );
   };
 
+  const comingSoon = (label: string) => () =>
+    toast('info', { title: 'Coming soon', description: `${label} is on its way.` });
+
   return (
     <View style={styles.root}>
       <SafeAreaView edges={['top']} style={styles.headerWrap}>
@@ -46,7 +94,8 @@ export function Profile() {
         contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.identityCard}>
+        {/* Identity card */}
+        <Card variant="hero" style={styles.identityCard}>
           <View style={styles.avatar}>
             <Text style={styles.avatarLetter}>
               {(user?.name?.[0] ?? '?').toUpperCase()}
@@ -62,31 +111,189 @@ export function Profile() {
               </View>
             ) : null}
           </View>
-        </View>
+        </Card>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Preferences</Text>
-          <View style={styles.placeholderRow}>
-            <Text style={styles.placeholderText}>
-              Currency, theme, hide-amounts, and AI key live here once Settings is wired.
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Account</Text>
-          <Button
-            label={logout.isPending ? 'Logging out…' : 'Log out'}
-            variant="danger"
-            fullWidth
-            disabled={logout.isPending}
-            onPress={confirmLogout}
+        {/* Preferences */}
+        <SettingsSection label="Preferences">
+          <ListItem
+            leading={<RowIcon Icon={Globe} colorKey="transit" />}
+            title="Currency"
+            subtitle="Default for new expenses"
+            trailing={
+              <View style={styles.trailing}>
+                <Text style={styles.trailingValue}>ETB</Text>
+                <ChevronRight size={18} color={theme.colors.onSurfaceDim} />
+              </View>
+            }
+            onPress={comingSoon('Currency picker')}
           />
-        </View>
+          <ListItem
+            leading={<RowIcon Icon={Sun} colorKey="food" />}
+            title="Theme"
+            subtitle="Appearance across the app"
+            trailing={
+              <View style={styles.trailing}>
+                <Text style={styles.trailingValue}>{themeLabel}</Text>
+                <ChevronRight size={18} color={theme.colors.onSurfaceDim} />
+              </View>
+            }
+            onPress={pickTheme}
+          />
+          <ListItem
+            leading={<RowIcon Icon={Eye} colorKey="bills" />}
+            title="Hide amounts"
+            subtitle="Blur balances by default"
+            trailing={
+              <Switch
+                value={hideAmounts}
+                onValueChange={setHideAmounts}
+                trackColor={{
+                  false: theme.colors.surface2,
+                  true: theme.colors.brand,
+                }}
+                thumbColor={theme.colors.surface}
+              />
+            }
+            hideDivider
+          />
+          <ListItem
+            leading={<RowIcon Icon={Sparkles} colorKey="shop" />}
+            title="Gemini API key"
+            subtitle="Used for AI expense parsing"
+            trailing={
+              <View style={styles.trailing}>
+                <AmountChip variant="muted">Not set</AmountChip>
+                <ChevronRight size={18} color={theme.colors.onSurfaceDim} />
+              </View>
+            }
+            onPress={comingSoon('Gemini API key')}
+            hideDivider
+          />
+        </SettingsSection>
+
+        {/* Data */}
+        <SettingsSection label="Data">
+          <ListItem
+            leading={<RowIcon Icon={Tag} colorKey="fun" />}
+            title="Categories"
+            subtitle="Manage default and custom"
+            trailing={<ChevronRight size={18} color={theme.colors.onSurfaceDim} />}
+            onPress={comingSoon('Categories')}
+          />
+          <ListItem
+            leading={<RowIcon Icon={DollarSign} colorKey="income" />}
+            title="Exchange rates"
+            subtitle="Currency conversion rates"
+            trailing={<ChevronRight size={18} color={theme.colors.onSurfaceDim} />}
+            onPress={comingSoon('Exchange rates')}
+          />
+          <ListItem
+            leading={<RowIcon Icon={Download} colorKey="health" />}
+            title="Export data"
+            subtitle="Download all your data"
+            trailing={<ChevronRight size={18} color={theme.colors.onSurfaceDim} />}
+            onPress={comingSoon('Export')}
+          />
+          <ListItem
+            leading={<RowIcon Icon={Upload} colorKey="transit" />}
+            title="Import data"
+            subtitle="From a backup file"
+            trailing={<ChevronRight size={18} color={theme.colors.onSurfaceDim} />}
+            onPress={comingSoon('Import')}
+            hideDivider
+          />
+        </SettingsSection>
+
+        {/* Account */}
+        <SettingsSection label="Account">
+          <ListItem
+            leading={<RowIcon Icon={KeyRound} colorKey="bills" />}
+            title="Change password"
+            subtitle="Update your sign-in credentials"
+            trailing={<ChevronRight size={18} color={theme.colors.onSurfaceDim} />}
+            onPress={comingSoon('Password change')}
+            hideDivider
+          />
+        </SettingsSection>
+
+        <Button
+          label={logout.isPending ? 'Logging out…' : 'Log out'}
+          variant="danger"
+          fullWidth
+          disabled={logout.isPending}
+          onPress={confirmLogout}
+        />
+
+        <Text style={styles.versionLine}>Enko · v1.0.0 (dev)</Text>
       </ScrollView>
     </View>
   );
 }
+
+// ──────────────────────────── Helpers ────────────────────────────
+
+type CategoryColorKey = 'food' | 'transit' | 'shop' | 'fun' | 'health' | 'bills' | 'income';
+
+function SettingsSection({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  const theme = useTheme();
+  return (
+    <View style={{ gap: spacing.sm }}>
+      <Text
+        style={{
+          ...typography.labelUp,
+          color: theme.colors.onSurfaceMuted,
+          paddingHorizontal: spacing.xs,
+        }}
+      >
+        {label}
+      </Text>
+      <Card variant="tight">{children}</Card>
+    </View>
+  );
+}
+
+function RowIcon({
+  Icon,
+  colorKey,
+}: {
+  Icon: LucideIcon;
+  colorKey: CategoryColorKey;
+}) {
+  const theme = useTheme();
+  const accent = theme.colors.category[colorKey];
+  return (
+    <View
+      style={{
+        width: 36,
+        height: 36,
+        borderRadius: radii.md,
+        backgroundColor: withAlpha(accent, 0.18),
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Icon size={18} color={accent} strokeWidth={2} />
+    </View>
+  );
+}
+
+function withAlpha(hex: string, alpha: number): string {
+  if (!hex.startsWith('#')) return hex;
+  const clean = hex.slice(1);
+  const [r, g, b] =
+    clean.length === 3
+      ? [clean[0] + clean[0], clean[1] + clean[1], clean[2] + clean[2]]
+      : [clean.slice(0, 2), clean.slice(2, 4), clean.slice(4, 6)];
+  return `rgba(${parseInt(r, 16)},${parseInt(g, 16)},${parseInt(b, 16)},${alpha})`;
+}
+
+// ──────────────────────────── Styles ────────────────────────────
 
 function makeStyles(theme: ReturnType<typeof useTheme>) {
   return StyleSheet.create({
@@ -103,13 +310,10 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
     body: {
       flexGrow: 1,
       paddingHorizontal: spacing['2xl'],
-      paddingBottom: spacing['2xl'],
+      paddingBottom: spacing['3xl'],
       gap: spacing.xl,
     },
     identityCard: {
-      backgroundColor: theme.colors.surface1,
-      borderRadius: radii['4xl'],
-      padding: spacing.xl,
       flexDirection: 'row',
       alignItems: 'center',
       gap: spacing.lg,
@@ -128,10 +332,7 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
       color: theme.colors.onBrand,
       letterSpacing: -0.8,
     },
-    identityText: {
-      flex: 1,
-      gap: spacing.xs,
-    },
+    identityText: { flex: 1, gap: spacing.xs },
     name: {
       ...typography.titleLG,
       color: theme.colors.onSurface,
@@ -157,22 +358,21 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
       color: theme.colors.onSurfaceMuted,
       fontFamily: typography.button.fontFamily,
     },
-    section: {
-      gap: spacing.md,
+    trailing: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
     },
-    sectionLabel: {
-      ...typography.labelUp,
-      color: theme.colors.onSurfaceMuted,
-      paddingHorizontal: spacing.xs,
-    },
-    placeholderRow: {
-      backgroundColor: theme.colors.surface1,
-      borderRadius: radii['3xl'],
-      padding: spacing.lg,
-    },
-    placeholderText: {
+    trailingValue: {
       ...typography.bodySm,
       color: theme.colors.onSurfaceMuted,
+      fontFamily: typography.button.fontFamily,
+    },
+    versionLine: {
+      ...typography.bodySm,
+      color: theme.colors.onSurfaceDim,
+      textAlign: 'center',
+      marginTop: spacing.sm,
     },
   });
 }
