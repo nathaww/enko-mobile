@@ -394,9 +394,65 @@ Auth state is held by `providers/AuthProvider.tsx` and consumed via `hooks/useAu
 
 ## Platform-Specific UI
 
-- `.ios.tsx` / `.android.tsx` only when UX truly differs (e.g. native date picker style, tab bar pattern).
+- `.ios.tsx` / `.android.tsx` only when UX truly differs (e.g. native date picker style).
 - Keep the shared `.tsx` version as fallback.
-- iOS: 5 flat tabs + bottom-right FAB. Android: 4 tabs with centered FAB lifted above the bar (per wireframe spec).
+
+### Tab bar — NativeTabs (UITabBarController on iOS, Material 3 on Android)
+
+The bottom tab bar uses `expo-router/unstable-native-tabs`, not a custom JS implementation. This is non-negotiable because:
+
+- iOS 26's **liquid glass** material is rendered by UIKit on native tab bars. A JS BlurView is only an approximation. NativeTabs gives us the real thing — content scrolls under the bar and refracts through it.
+- We get free native gestures (long-press, drag-reordering on iPad), proper safe-area handling, dynamic type, and accessibility.
+
+**What we control via NativeTabs props:**
+- `tintColor` — selected icon + label color (set to `theme.colors.brand`).
+- `labelStyle` — font family and size (we use Plus Jakarta Bold at 10px).
+- Per-trigger icons — `sf={{ default, selected }}` for iOS SF Symbols, `drawable` / `md` for Android Material Symbols.
+
+**What we deliberately don't control:**
+- Bar background color — the bar IS the liquid glass material on iOS 26, must stay translucent. Trying to paint it defeats the entire effect.
+- Inactive icon color — system picks an adaptive translucent color that reads against the glass.
+
+**Theming still works** for the bar: `tintColor` reads from our theme, light/dark mode is automatic via system appearance (the glass material adapts), and labels use our brand font. Every screen ABOVE the tab bar is fully themed as normal.
+
+**Trade-offs we accepted:**
+- No custom animations on the tab item itself (no brand-colored pill behind the icon).
+- No floating rounded card aesthetic — the bar is the standard bottom dock.
+- 5-tab max on Android (Material Design constraint).
+- Cannot measure tab bar height. `useBottomTabBarHeight` does not work — screens should rely on `useSafeAreaInsets().bottom`, which NativeTabs adjusts to include the bar.
+
+**iOS: 5 flat tabs.** No center FAB in the tab bar; a quick-add FAB lives on individual screens (Home, Expenses) at bottom-right.
+
+### Tab icons (SVG → PNG conversion workflow)
+
+Tab icons must be **PNG** files, not SVG components. iOS treats PNGs as template images (alpha-channel-only) and tints them at runtime via `tintColor` / `iconColor`. SVG React elements passed as `src` do NOT get this treatment — they render with whatever color is baked in.
+
+Drop SVG sources into `assets/icons/tabs/` named `<name>.svg` (outline) and `<name>-filled.svg` (filled), then run:
+
+```bash
+pnpm icons:convert
+```
+
+The `scripts/convert-tab-icons.sh` script:
+1. Reads every `.svg` in `assets/icons/tabs/`
+2. Replaces `currentColor` with `#000000` (template tinting reads only alpha; source color is throwaway)
+3. Rasterizes each at `24×24` (`@1x`), `48×48` (`@2x`), and `72×72` (`@3x`) so retina displays stay sharp
+4. Drops the PNGs alongside the SVGs
+
+Requires `rsvg-convert` (`brew install librsvg`).
+
+**Wiring in `app/(tabs)/_layout.tsx`:**
+
+```tsx
+<Icon src={{
+  default:  require('@/assets/icons/tabs/home.png'),         // inactive (outline)
+  selected: require('@/assets/icons/tabs/home-filled.png'),  // active   (filled)
+}} />
+```
+
+`tintColor` (active) and `iconColor` (inactive) on the parent `<NativeTabs>` then tint both. Both come from the theme — never hardcode.
+
+**Sources for outline + filled icon pairs:** Phosphor (Regular + Fill weights), Heroicons (Outline + Solid), Tabler, Iconoir. SVG download → drop in `assets/icons/tabs/` → `pnpm icons:convert` → done.
 
 ## Assets
 

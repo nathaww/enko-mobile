@@ -7,6 +7,7 @@ import React, {
   useState,
 } from 'react';
 import { secureStorage } from '@/services/secureStorage';
+import { getMe } from '@/features/auth/auth-api';
 import type { AuthResponse, AuthUser } from '@/features/auth/auth.types';
 
 type AuthStatus = 'bootstrapping' | 'authenticated' | 'unauthenticated';
@@ -42,8 +43,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (cancelled) return;
         setHasOnboarded(onboarded);
         if (session) {
-          // TODO: validate by calling /auth/me; for now trust stored token.
+          // Hydrate the user profile so screens like Profile can render
+          // immediately on cold launch. If the call fails (network, expired
+          // token), we still surface the app shell as authenticated — the
+          // next API call will trigger a 401 and the interceptor will clear
+          // the session.
           setStatus('authenticated');
+          try {
+            const me = await getMe();
+            if (!cancelled) setUser(me);
+          } catch {
+            // Silent: keep status='authenticated' so the user sees the app;
+            // missing user data shows as a loading state in Profile.
+          }
         } else {
           setStatus('unauthenticated');
         }

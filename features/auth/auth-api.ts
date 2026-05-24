@@ -1,6 +1,7 @@
 import { api } from '@/api/axios';
 import type {
   AuthResponse,
+  AuthUser,
   ForgotPasswordRequest,
   LoginRequest,
   RegisterRequest,
@@ -32,6 +33,21 @@ function mockAuthResponse(email: string, name = 'Nathan'): AuthResponse {
       isVerified: true,
     },
   };
+}
+
+export async function getMe(): Promise<AuthUser> {
+  if (useDevStub) {
+    await delay(200);
+    return {
+      id: 'dev-user',
+      name: 'Nathan',
+      email: 'nathan@example.com',
+      isActive: true,
+      isVerified: true,
+    };
+  }
+  const res = await api.get<AuthUser>('/auth/me');
+  return res.data;
 }
 
 export async function loginUser(data: LoginRequest): Promise<AuthResponse> {

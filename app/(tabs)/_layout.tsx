@@ -1,59 +1,109 @@
-import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import {
+  NativeTabs,
+  Icon,
+  Label,
+} from 'expo-router/unstable-native-tabs';
+import { useTheme } from '@/hooks/useTheme';
+import { typography } from '@/theme';
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
-
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+/**
+ * Native tab bar.
+ *
+ * iOS renders the actual UITabBarController, which on iOS 26 uses the new
+ * "liquid glass" material that refracts content scrolling underneath. Earlier
+ * iOS versions fall back to a standard translucent tab bar. Android renders
+ * Material 3's native bottom navigation.
+ *
+ * ─── Icon API quick reference ───────────────────────────────────────────
+ * The Icon component has three MUTUALLY EXCLUSIVE shapes:
+ *
+ *   1. Cross-platform custom PNG (recommended once you have designer assets):
+ *      <Icon src={{
+ *        default:  require('@/assets/icons/tabs/home.png'),
+ *        selected: require('@/assets/icons/tabs/home-filled.png'),
+ *      }} />
+ *
+ *   2. iOS SF Symbol + Android system drawable (the current fallback):
+ *      <Icon
+ *        sf={{ default: 'house', selected: 'house.fill' }}
+ *        drawable="ic_home"
+ *      />
+ *
+ *   3. iOS SF Symbol + Android custom PNG (have-your-cake):
+ *      <Icon
+ *        sf={{ default: 'house', selected: 'house.fill' }}
+ *        androidSrc={{ default: require('...'), selected: require('...') }}
+ *      />
+ *
+ * The `default` PNG = outline (inactive). The `selected` PNG = filled (active).
+ * `tintColor` / `iconColor` still apply on top, so single-color PNGs get
+ * tinted by your theme; multi-color PNGs render as-is.
+ *
+ * Phosphor's Regular + Fill weights are perfect for this — same icon shape,
+ * one outlined, one filled. https://phosphoricons.com
+ */
+export default function TabsLayout() {
+  const theme = useTheme();
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="two"
-        options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-        }}
-      />
-    </Tabs>
+    <NativeTabs
+      tintColor={theme.colors.brand}
+      iconColor={theme.colors.onSurfaceMuted}
+      labelStyle={{
+        fontFamily: typography.button.fontFamily,
+        fontSize: 10,
+        color: theme.colors.onSurfaceMuted,
+      }}
+    >
+      <NativeTabs.Trigger name="index">
+        <Icon
+          src={{
+            default: require('@/assets/icons/tabs/home.png'),
+            selected: require('@/assets/icons/tabs/home-filled.png'),
+          }}
+        />
+        <Label>Home</Label>
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="expenses">
+        <Icon
+          src={{
+            default: require('@/assets/icons/tabs/expenses.png'),
+            selected: require('@/assets/icons/tabs/expenses-filled.png'),
+          }}
+        />
+        <Label>Expenses</Label>
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="money">
+        <Icon
+          src={{
+            default: require('@/assets/icons/tabs/money.png'),
+            selected: require('@/assets/icons/tabs/money-filled.png'),
+          }}
+        />
+        <Label>Money</Label>
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="insights">
+        <Icon
+          src={{
+            default: require('@/assets/icons/tabs/insights.png'),
+            selected: require('@/assets/icons/tabs/insights-filled.png'),
+          }}
+        />
+        <Label>Insights</Label>
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="profile">
+        <Icon
+          src={{
+            default: require('@/assets/icons/tabs/profile.png'),
+            selected: require('@/assets/icons/tabs/profile-filled.png'),
+          }}
+        />
+        <Label>Profile</Label>
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }
