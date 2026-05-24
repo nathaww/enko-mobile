@@ -8,6 +8,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import {
   useFonts,
@@ -21,12 +22,9 @@ import {
 import { AppProviders } from '@/providers/AppProviders';
 import { useThemeContext } from '@/providers/ThemeProvider';
 import { setupInterceptors } from '@/api/interceptors';
+import { AppToast } from '@/components/Toast';
 
 export { ErrorBoundary } from 'expo-router';
-
-export const unstable_settings = {
-  initialRouteName: '(tabs)',
-};
 
 SplashScreen.preventAutoHideAsync();
 setupInterceptors();
@@ -51,9 +49,11 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <AppProviders>
-      <RootLayoutNav />
-    </AppProviders>
+    <SafeAreaProvider>
+      <AppProviders>
+        <RootLayoutNav />
+      </AppProviders>
+    </SafeAreaProvider>
   );
 }
 
@@ -90,10 +90,14 @@ function RootLayoutNav() {
   return (
     <NavThemeProvider value={navTheme}>
       <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: theme.colors.surface } }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(onboarding)" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(tabs)" />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>
+      <AppToast />
     </NavThemeProvider>
   );
 }
