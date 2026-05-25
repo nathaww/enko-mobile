@@ -107,16 +107,6 @@ export default function TabsLayout() {
         <Label>Money</Label>
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="insights">
-        <Icon
-          src={{
-            default: require('@/assets/icons/tabs/insights.png'),
-            selected: require('@/assets/icons/tabs/insights-filled.png'),
-          }}
-        />
-        <Label>Insights</Label>
-      </NativeTabs.Trigger>
-
       <NativeTabs.Trigger name="profile">
         <Icon
           src={{

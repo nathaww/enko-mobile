@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Sparkles } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { radii, spacing, typography } from '@/theme';
-import type { SpendingComparison } from '../insights.types';
+import type { SpendingComparison } from '../home.types';
 
 type Props = {
   data: SpendingComparison | undefined;

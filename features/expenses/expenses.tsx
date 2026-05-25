@@ -200,10 +200,13 @@ export function Expenses() {
 
       <Pressable
         onPress={openAdd}
+        // Press feedback is the deeper brand color, not opacity — opacity
+        // makes the FAB look semi-transparent against the page, which the
+        // user doesn't want. A solid color shift keeps the button opaque.
         style={({ pressed }) => [
           styles.fab,
           { bottom: fabBottom },
-          pressed && { opacity: 0.85 },
+          pressed && { backgroundColor: theme.colors.brandDeep },
         ]}
         accessibilityRole="button"
         accessibilityLabel="Add expense"
@@ -228,7 +231,7 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
       backgroundColor: theme.colors.brandSoft,
       borderBottomLeftRadius: radii['5xl'],
       borderBottomRightRadius: radii['5xl'],
-      paddingHorizontal: spacing['2xl'],
+      paddingHorizontal: spacing.xl,
       paddingTop: spacing.md,
       paddingBottom: spacing.lg,
       gap: spacing.md,
@@ -268,11 +271,11 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
       letterSpacing: -0.5,
     },
     filtersWrap: {
-      marginHorizontal: -spacing['2xl'],
-      paddingHorizontal: spacing['2xl'],
+      marginHorizontal: -spacing.xl,
+      paddingHorizontal: spacing.xl,
     },
     body: {
-      paddingHorizontal: spacing['2xl'],
+      paddingHorizontal: spacing.xl,
       paddingTop: spacing.lg,
       paddingBottom: spacing['5xl'] + spacing['2xl'],
       gap: spacing.lg,
@@ -280,10 +283,13 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
     group: { gap: spacing.sm },
     fab: {
       position: 'absolute',
-      right: spacing['2xl'],
+      right: spacing.xl,
       width: 58,
       height: 58,
-      borderRadius: radii['2xl'],
+      // Half of width/height = perfect circle. radii.pill (999) also works
+      // but the explicit half is more legible and isn't doing any thinking
+      // for a fixed-size element.
+      borderRadius: 29,
       backgroundColor: theme.colors.brand,
       alignItems: 'center',
       justifyContent: 'center',

@@ -169,7 +169,7 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
   return StyleSheet.create({
     root: { flex: 1, backgroundColor: theme.colors.surface },
     headerWrap: {
-      paddingHorizontal: spacing['2xl'],
+      paddingHorizontal: spacing.xl,
       paddingTop: spacing.md,
       paddingBottom: spacing.md,
       gap: spacing.xs,
@@ -197,7 +197,7 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
       justifyContent: 'center',
     },
     body: {
-      paddingHorizontal: spacing['2xl'],
+      paddingHorizontal: spacing.xl,
       paddingBottom: spacing['3xl'],
       gap: spacing.xl,
     },

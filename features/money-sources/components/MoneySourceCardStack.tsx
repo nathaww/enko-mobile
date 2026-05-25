@@ -30,21 +30,36 @@ type Props = {
 
 // Palette for the stack. Each card gets a stable color derived from its id
 // so reorderings don't shuffle the look.
-const CARD_COLORS = [
-  '#1E5F3A', // deep green
-  '#1F3B7A', // deep blue
-  '#7A2E3B', // burgundy
-  '#5C3B7A', // plum
-  '#7A5520', // amber
-  '#1F5C5C', // teal
+//
+// The previous palette (burgundy / plum / amber / teal) felt like generic
+// "credit card" stock and clashed with Enko's lime-green brand. This one
+// is brand-aligned: the lead color is `theme.colors.onBrand` (the deep
+// green Enko already uses as the foreground on brand-soft surfaces), and
+// the rest are deep, low-saturation tones in the same green/teal/blue
+// family so they harmonize with the brand instead of fighting it.
+//
+// Backend stores no per-card color (only `icon`), and web renders money
+// sources as a table without card backgrounds — so there's nothing to
+// inherit from the API; this palette is purely a mobile concern.
+const CARD_COLOR_FALLBACKS = [
+  '#0E4A1E', // forest green   — same hue family as the brand
+  '#143F4F', // teal-ocean     — analogous cool
+  '#1F4F5E', // deep cypress   — green-teal bridge
+  '#0F2C40', // midnight blue  — grounded cool accent
+  '#23304F', // dusk indigo    — quiet contrast
+  '#1A2E2A', // pine slate     — near-neutral with green tint
 ];
 
-function colorForId(id: string): string {
+function colorForId(id: string, defaultColor: string): string {
+  // First slot is reserved for the deep-brand color so the most prominent
+  // card on screen always carries the brand voice. Stable hash decides the
+  // rest from the fallback palette.
   let hash = 0;
   for (let i = 0; i < id.length; i++) {
     hash = (hash * 31 + id.charCodeAt(i)) | 0;
   }
-  return CARD_COLORS[Math.abs(hash) % CARD_COLORS.length];
+  const slot = Math.abs(hash) % (CARD_COLOR_FALLBACKS.length + 1);
+  return slot === 0 ? defaultColor : CARD_COLOR_FALLBACKS[slot - 1];
 }
 
 /**
@@ -212,7 +227,8 @@ function CardItem({
   const SWIPE_THRESHOLD = 80;
   const VELOCITY_THRESHOLD = 600;
 
-  const bgColor = colorForId(source.id);
+  const theme = useTheme();
+  const bgColor = colorForId(source.id, theme.colors.onBrand);
 
   // Fade out cards beyond the visible "peek" depth so a long list doesn't
   // look like a wall of stripes behind the front.

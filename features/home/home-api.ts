@@ -1,11 +1,13 @@
 import { api } from '@/api/axios';
 import { unwrapPaginated, type PaginatedResponse } from '@/types/common';
 import type {
+  BudgetComparison,
   DashboardOverview,
   DashboardTrends,
-  ExpenseOverview,
+  ExpenseComposition,
   Period,
   RecentExpense,
+  SpendingComparison,
   TotalBalance,
 } from './home.types';
 
@@ -50,27 +52,6 @@ export async function getTotalBalance(period: Period): Promise<TotalBalance> {
   return res.data;
 }
 
-export async function getExpensesOverview(period: Period): Promise<ExpenseOverview> {
-  if (useDevStub) {
-    await delay(250);
-    return {
-      summary: 'Spending is on track this month.',
-      thisMonth: { total: 4120, currency: 'ETB' },
-      yearToDate: { total: 38900, currency: 'ETB' },
-      topCategories: [
-        { name: 'Food & Dining', amount: 1730, percentage: 42 },
-        { name: 'Transportation', amount: 740, percentage: 18 },
-        { name: 'Shopping', amount: 540, percentage: 13 },
-        { name: 'Entertainment', amount: 330, percentage: 8 },
-      ],
-    };
-  }
-  const res = await api.get<ExpenseOverview>('/dashboard/expenses-overview', {
-    params: { period },
-  });
-  return res.data;
-}
-
 export async function getTrends(): Promise<DashboardTrends> {
   if (useDevStub) {
     await delay(250);
@@ -83,6 +64,63 @@ export async function getTrends(): Promise<DashboardTrends> {
     return { monthlyTrends: make(12), weeklyTrends: make(7) };
   }
   const res = await api.get<DashboardTrends>('/dashboard/trends');
+  return res.data;
+}
+
+// ───────────────────── Composition / Budget / Peer ─────────────────────
+
+export async function getExpenseComposition(): Promise<ExpenseComposition> {
+  if (useDevStub) {
+    await delay(250);
+    return {
+      categoryBreakdown: [
+        { category: 'Food & Dining', amount: 1730, percentage: 42 },
+        { category: 'Transportation', amount: 740, percentage: 18 },
+        { category: 'Shopping', amount: 740, percentage: 18 },
+        { category: 'Entertainment', amount: 490, percentage: 12 },
+        { category: 'Utilities', amount: 420, percentage: 10 },
+      ],
+    };
+  }
+  const res = await api.get<ExpenseComposition>('/dashboard/expense-composition');
+  return res.data;
+}
+
+export async function getBudgetComparison(): Promise<BudgetComparison> {
+  if (useDevStub) {
+    await delay(250);
+    return {
+      comparisons: [
+        { moneySource: 'CBE', budget: 5000, expense: 4000, remaining: 1000, remainingPercentage: 20 },
+        { moneySource: 'Cash', budget: 1000, expense: 400, remaining: 600, remainingPercentage: 60 },
+        { moneySource: 'Awash', budget: 2000, expense: 2200, remaining: -200, remainingPercentage: -10 },
+      ],
+      totalBudget: 8000,
+      totalExpense: 6600,
+      totalRemaining: 1400,
+    };
+  }
+  const res = await api.get<BudgetComparison>('/dashboard/budget-comparison');
+  return res.data;
+}
+
+export async function getSpendingComparison(): Promise<SpendingComparison> {
+  if (useDevStub) {
+    await delay(300);
+    return {
+      insights: '23% less on food than peers',
+      categoryComparisons: [
+        { categoryName: 'Food & Dining', userAmount: 1730, averageAmount: 2245, percentageDifference: -23, currency: 'ETB' },
+        { categoryName: 'Transportation', userAmount: 740, averageAmount: 600, percentageDifference: 23, currency: 'ETB' },
+      ],
+      overallDifferencePercentage: -8.5,
+      comparisonUserCount: 42,
+      userMonthlySpending: 4120,
+      averageMonthlySpending: 4504,
+      currency: 'ETB',
+    };
+  }
+  const res = await api.get<SpendingComparison>('/user-insights/spending-comparison');
   return res.data;
 }
 

@@ -5,8 +5,8 @@ import { Card } from '@/components/Card';
 import { useTheme } from '@/hooks/useTheme';
 import { fontFamily, spacing, typography } from '@/theme';
 import { formatAmount } from '@/utils/formatAmount';
-import { getCategoryColorKey } from '@/features/home/category-icons';
-import type { CategoryExpense } from '../insights.types';
+import { getCategoryColorKey } from '../category-icons';
+import type { CategoryExpense } from '../home.types';
 
 type Props = {
   data: CategoryExpense[] | undefined;
@@ -25,9 +25,7 @@ const INNER_RADIUS = 52;
  *
  * Colors come from the theme's category palette via getCategoryColorKey
  * so a "Food" wedge matches the food-category icon dot elsewhere in the
- * app. We dedupe color collisions (two categories that map to the same
- * palette key) by lightly tinting the second occurrence — otherwise
- * adjacent same-color slices read as one.
+ * app.
  */
 export function CompositionCard({ data, loading }: Props) {
   const theme = useTheme();

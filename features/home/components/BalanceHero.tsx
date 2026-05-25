@@ -13,6 +13,11 @@ type Props = {
   currency?: string;
   /** Optional delta percentage to show as a chip. Pass undefined to hide. */
   deltaPercentage?: number;
+  /**
+   * Percent of monthly budget that has been spent (0–100+). Renders as a
+   * chip below the balance. Pass undefined to hide.
+   */
+  budgetUtilization?: number;
   /** Skeleton while data is loading. */
   loading?: boolean;
 };
@@ -25,6 +30,7 @@ export function BalanceHero({
   totalBalance,
   currency = 'ETB',
   deltaPercentage,
+  budgetUtilization,
   loading,
 }: Props) {
   const theme = useTheme();
@@ -52,6 +58,23 @@ export function BalanceHero({
     deltaPercentage === undefined
       ? null
       : `${deltaPercentage >= 0 ? '▲' : '▼'} ${Math.abs(deltaPercentage).toFixed(1)}%`;
+
+  // Budget utilization color thresholds: comfortably under (pos), getting
+  // close (muted/info), over budget (neg). Keeps the daily-glance signal
+  // legible without needing to read the number.
+  const utilizationVariant: 'pos' | 'neg' | 'muted' =
+    budgetUtilization === undefined
+      ? 'muted'
+      : budgetUtilization >= 90
+      ? 'neg'
+      : budgetUtilization >= 70
+      ? 'muted'
+      : 'pos';
+
+  const utilizationLabel =
+    budgetUtilization === undefined
+      ? null
+      : `${Math.round(budgetUtilization)}% of budget`;
 
   return (
     <Card variant="hero" style={styles.card}>
@@ -85,10 +108,17 @@ export function BalanceHero({
         )}
       </View>
 
-      {deltaLabel ? (
-        <View style={styles.deltaRow}>
-          <AmountChip variant={deltaVariant}>{deltaLabel}</AmountChip>
-          <Text style={styles.deltaCaption}>vs last period</Text>
+      {deltaLabel || utilizationLabel ? (
+        <View style={styles.chipsRow}>
+          {deltaLabel ? (
+            <AmountChip variant={deltaVariant}>{deltaLabel}</AmountChip>
+          ) : null}
+          {utilizationLabel ? (
+            <AmountChip variant={utilizationVariant}>{utilizationLabel}</AmountChip>
+          ) : null}
+          {deltaLabel && !utilizationLabel ? (
+            <Text style={styles.deltaCaption}>vs last period</Text>
+          ) : null}
         </View>
       ) : null}
     </Card>
@@ -128,10 +158,11 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
       color: theme.colors.onSurfaceMuted,
       letterSpacing: -0.4,
     },
-    deltaRow: {
+    chipsRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: spacing.sm,
+      flexWrap: 'wrap',
+      gap: spacing.xs,
       marginTop: spacing.xs,
     },
     deltaCaption: {

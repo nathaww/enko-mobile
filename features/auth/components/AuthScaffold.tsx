@@ -86,7 +86,7 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
     flex: { flex: 1 },
     scrollContent: {
       flexGrow: 1,
-      paddingHorizontal: spacing['2xl'],
+      paddingHorizontal: spacing.xl,
       paddingBottom: spacing.lg,
     },
     topRow: {
@@ -140,7 +140,7 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
       gap: spacing.lg,
     },
     footer: {
-      paddingHorizontal: spacing['2xl'],
+      paddingHorizontal: spacing.xl,
       paddingTop: spacing.md,
       paddingBottom: spacing.md,
       gap: spacing.sm,

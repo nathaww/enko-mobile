@@ -44,7 +44,7 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
     root: {
       flex: 1,
       backgroundColor: theme.colors.surface,
-      paddingHorizontal: spacing['2xl'],
+      paddingHorizontal: spacing.xl,
     },
     hero: {
       flex: 1,

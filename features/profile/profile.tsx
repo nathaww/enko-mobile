@@ -276,7 +276,7 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
   return StyleSheet.create({
     root: { flex: 1, backgroundColor: theme.colors.surface },
     headerWrap: {
-      paddingHorizontal: spacing['2xl'],
+      paddingHorizontal: spacing.xl,
       paddingTop: spacing.md,
       paddingBottom: spacing.lg,
     },
@@ -286,7 +286,7 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
     },
     body: {
       flexGrow: 1,
-      paddingHorizontal: spacing['2xl'],
+      paddingHorizontal: spacing.xl,
       paddingBottom: spacing['3xl'],
       gap: spacing.xl,
     },

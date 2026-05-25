@@ -10,8 +10,11 @@ import { useTheme } from '@/hooks/useTheme';
 import { spacing } from '@/theme';
 
 import {
-  getExpensesOverview,
+  getBudgetComparison,
+  getExpenseComposition,
+  getOverview,
   getRecentExpenses,
+  getSpendingComparison,
   getTotalBalance,
   getTrends,
 } from './home-api';
@@ -20,9 +23,11 @@ import type { Period } from './home.types';
 
 import { HomeHeader } from './components/HomeHeader';
 import { BalanceHero } from './components/BalanceHero';
-import { TopCategoriesPills } from './components/TopCategoriesPills';
 import { SpendingTrendCard } from './components/SpendingTrendCard';
+import { CompositionCard } from './components/CompositionCard';
+import { BudgetCard } from './components/BudgetCard';
 import { RecentActivityCard } from './components/RecentActivityCard';
+import { PeerInsightCard } from './components/PeerInsightCard';
 
 const PERIOD_OPTIONS = [
   { label: 'Week', value: 'week' as const },
@@ -31,9 +36,20 @@ const PERIOD_OPTIONS = [
 ];
 
 /**
- * Home / dashboard tab. Greets the user, shows their total balance, top
- * categories, spending trend, and recent activity. All server state goes
- * through React Query so caching + revalidation are handled automatically.
+ * Home / dashboard tab. The Insights tab used to live as a separate
+ * destination — it has been folded into Home so users only have one place
+ * to glance at their money picture. Order from top:
+ *   1. Greeting + nav chrome
+ *   2. Balance hero (with budget-utilization chip)
+ *   3. Period selector (Week / Month / Year)
+ *   4. Spending trend sparkline
+ *   5. Category composition donut
+ *   6. Budget vs actual per money source
+ *   7. Recent activity (5 rows, deep-links to Expenses)
+ *   8. AI peer-comparison insight (only if the backend returns one)
+ *
+ * All server state goes through React Query so caching + revalidation are
+ * handled automatically; a single pull-to-refresh invalidates every key.
  */
 export function Home() {
   const theme = useTheme();
@@ -51,12 +67,24 @@ export function Home() {
         queryFn: () => getTotalBalance(period),
       },
       {
-        queryKey: homeQueryKeys.expensesOverview(period),
-        queryFn: () => getExpensesOverview(period),
+        queryKey: homeQueryKeys.overview(),
+        queryFn: getOverview,
       },
       {
         queryKey: homeQueryKeys.trends(),
         queryFn: getTrends,
+      },
+      {
+        queryKey: homeQueryKeys.composition(),
+        queryFn: getExpenseComposition,
+      },
+      {
+        queryKey: homeQueryKeys.budget(),
+        queryFn: getBudgetComparison,
+      },
+      {
+        queryKey: homeQueryKeys.peerComparison(),
+        queryFn: getSpendingComparison,
       },
       {
         queryKey: homeQueryKeys.recent(5),
@@ -65,7 +93,8 @@ export function Home() {
     ],
   });
 
-  const [balanceQ, overviewQ, trendsQ, recentQ] = results;
+  const [balanceQ, overviewQ, trendsQ, compositionQ, budgetQ, peerQ, recentQ] =
+    results;
   const isAnyLoading = results.some((r) => r.isLoading);
   const isAnyRefetching = results.some((r) => r.isRefetching);
 
@@ -108,6 +137,7 @@ export function Home() {
         <BalanceHero
           totalBalance={balanceQ.data?.totalBalance}
           currency={balanceQ.data?.currency}
+          budgetUtilization={overviewQ.data?.budgetUtilization}
           loading={isAnyLoading}
         />
 
@@ -118,15 +148,29 @@ export function Home() {
           accessibilityLabel="Period"
         />
 
-        <TopCategoriesPills categories={overviewQ.data?.topCategories} />
+        <SpendingTrendCard
+          points={trendsPoints}
+          period={period}
+          loading={trendsQ.isLoading}
+        />
 
-        <SpendingTrendCard points={trendsPoints} period={period} loading={trendsQ.isLoading} />
+        <CompositionCard
+          data={compositionQ.data?.categoryBreakdown}
+          loading={compositionQ.isLoading}
+        />
+
+        <BudgetCard
+          data={budgetQ.data?.comparisons}
+          loading={budgetQ.isLoading}
+        />
 
         <RecentActivityCard
           expenses={recentQ.data}
           loading={recentQ.isLoading}
           onPressSeeAll={() => router.push('/(tabs)/expenses')}
         />
+
+        <PeerInsightCard data={peerQ.data} loading={peerQ.isLoading} />
       </ScrollView>
     </View>
   );
@@ -143,14 +187,14 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
   return StyleSheet.create({
     root: { flex: 1, backgroundColor: theme.colors.surface },
     headerWrap: {
-      paddingHorizontal: spacing['2xl'],
+      paddingHorizontal: spacing.xl,
       paddingTop: spacing.md,
       paddingBottom: spacing.lg,
     },
     body: {
       flexGrow: 1,
-      paddingHorizontal: spacing['2xl'],
-      paddingBottom: spacing['2xl'],
+      paddingHorizontal: spacing.xl,
+      paddingBottom: spacing['5xl'] + spacing['2xl'],
       gap: spacing.lg,
     },
   });

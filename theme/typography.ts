@@ -9,22 +9,27 @@ export const fontFamily = {
 } as const;
 
 export const typography = {
+  // Display lineHeights are ~1.18x fontSize. Plus Jakarta ExtraBold has
+  // tall ascenders + descenders (the "g", "y", "p" tails); a sub-1.15x
+  // lineHeight clips them on the visible page, especially when the title
+  // sits flush against a sibling element above. 1.18x is the sweet spot
+  // for a tight display feel without losing glyph extremities.
   displayXL: {
     fontFamily: fontFamily.display,
     fontSize: 44,
-    lineHeight: 46,
+    lineHeight: 52,
     letterSpacing: -2.0,
   },
   displayLG: {
     fontFamily: fontFamily.display,
     fontSize: 34,
-    lineHeight: 36,
+    lineHeight: 42,
     letterSpacing: -1.4,
   },
   displayMD: {
     fontFamily: fontFamily.display,
     fontSize: 24,
-    lineHeight: 28,
+    lineHeight: 32,
     letterSpacing: -0.72,
   },
   titleLG: {

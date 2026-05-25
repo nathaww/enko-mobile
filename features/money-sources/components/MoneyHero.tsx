@@ -82,7 +82,7 @@ function makeStyles(theme: ReturnType<typeof useTheme>) {
       backgroundColor: theme.colors.brandSoft,
       borderBottomLeftRadius: radii['5xl'],
       borderBottomRightRadius: radii['5xl'],
-      paddingHorizontal: spacing['2xl'],
+      paddingHorizontal: spacing.xl,
       paddingTop: spacing.md,
       paddingBottom: spacing.xl,
       gap: spacing.xs,

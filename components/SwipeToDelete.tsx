@@ -1,19 +1,23 @@
-import React, { useMemo, useRef } from 'react';
-import {
-  Alert,
-  Animated,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-import { Swipeable } from 'react-native-gesture-handler';
+import React, { useMemo } from 'react';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Reanimated, {
+  Extrapolation,
+  interpolate,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import { Trash2 } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useHaptic } from '@/hooks/useHaptic';
 import { radii, spacing, typography } from '@/theme';
 
-type AnimatedInterpolation = ReturnType<Animated.Value['interpolate']>;
+const DELETE_WIDTH = 92;
+const OPEN_VELOCITY = -500;
+const OVERSHOOT = DELETE_WIDTH * 1.18;
+const SPRING = { damping: 22, stiffness: 220 } as const;
 
 type Props = {
   children: React.ReactNode;
@@ -33,13 +37,23 @@ type Props = {
 };
 
 /**
- * Swipe-right-to-delete wrapper. Reveals a red "Delete" panel on the LEFT
- * side as the row drags right (matches the user-requested "swipe right"
- * direction). Tapping the revealed panel opens an Alert confirmation; only
- * after the user confirms does `onDelete` fire.
+ * Swipe-left-to-delete wrapper with a true push layout:
  *
- * Uses the RN Animated API (not Reanimated) because that is what
- * gesture-handler's Swipeable passes into renderLeftActions.
+ *   [   children (flex: 1)   ] [ panel (animated width 0→92) ]
+ *
+ * Both sit in a single flex-row container. As the panel's width grows under
+ * the drag, the child wrapper shrinks (because `flex: 1` yields to a
+ * fixed-width sibling). The child's content reflows naturally — title
+ * ellipsizes via `numberOfLines={1}`, the trailing chip moves left in
+ * lockstep with the shrinking wrap — so the delete button never overlaps
+ * anything: it's a static peer of the row, not an absolute overlay.
+ *
+ * Why the panel content is wrapped in a fixed-width inner: when the outer
+ * panel width is 0, an unconstrained icon + label column would try to wrap
+ * the word "Delete" one character per line, ballooning intrinsic height and
+ * stretching the whole row. Fixing the inner width at DELETE_WIDTH (and
+ * letting the outer's `overflow: hidden` clip it when narrow) keeps the
+ * row height equal to the children's natural height at all times.
  */
 export function SwipeToDelete({
   children,
@@ -51,103 +65,165 @@ export function SwipeToDelete({
 }: Props) {
   const theme = useTheme();
   const haptic = useHaptic();
-  const swipeRef = useRef<Swipeable>(null);
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
-  if (disabled) return <>{children}</>;
+  // Panel width in px. 0 = closed, DELETE_WIDTH = fully open.
+  const offset = useSharedValue(0);
+  // Snapshot of `offset` at the gesture's start so dragging from a half-open
+  // state continues from where the finger lands.
+  const startOffset = useSharedValue(0);
 
-  const close = () => swipeRef.current?.close();
+  const closeJS = () => {
+    offset.value = withSpring(0, SPRING);
+  };
 
   const fire = () => {
     if (!confirmTitle) {
       haptic('success');
       onDelete();
-      close();
+      closeJS();
       return;
     }
     Alert.alert(
       confirmTitle,
       confirmDescription,
       [
-        { text: 'Cancel', style: 'cancel', onPress: close },
+        { text: 'Cancel', style: 'cancel', onPress: closeJS },
         {
           text: confirmLabel,
           style: 'destructive',
           onPress: () => {
             haptic('warning');
             onDelete();
-            close();
+            closeJS();
           },
         },
       ],
-      { cancelable: true, onDismiss: close }
+      { cancelable: true, onDismiss: closeJS }
     );
   };
 
-  return (
-    <Swipeable
-      ref={swipeRef}
-      // renderLeftActions = panel revealed when row swipes RIGHT.
-      // (gesture-handler names sides by where the action panel lives.)
-      renderLeftActions={(progress) => (
-        <DeleteAction progress={progress} onPress={fire} styles={styles} />
-      )}
-      onSwipeableWillOpen={(direction) => {
-        if (direction === 'left') haptic('selection');
-      }}
-      leftThreshold={60}
-      friction={1.6}
-    >
-      {children}
-    </Swipeable>
-  );
-}
+  if (disabled) return <>{children}</>;
 
-function DeleteAction({
-  progress,
-  onPress,
-  styles,
-}: {
-  progress: AnimatedInterpolation;
-  onPress: () => void;
-  styles: ReturnType<typeof makeStyles>;
-}) {
-  const scale = progress.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0.6, 1, 1],
-    extrapolate: 'clamp',
+  const pan = Gesture.Pan()
+    // activeOffsetX requires meaningful horizontal motion before claiming
+    // the gesture; failOffsetY hands off to a vertical scroller if the user
+    // is actually trying to scroll the list.
+    .activeOffsetX([-12, 12])
+    .failOffsetY([-15, 15])
+    .onBegin(() => {
+      startOffset.value = offset.value;
+    })
+    .onUpdate((e) => {
+      // Swipe LEFT = negative translationX → grow offset positively.
+      const raw = startOffset.value - e.translationX;
+      offset.value =
+        raw < 0
+          ? 0
+          : raw > OVERSHOOT
+            ? OVERSHOOT + (raw - OVERSHOOT) * 0.25
+            : raw;
+    })
+    .onEnd((e) => {
+      const shouldOpen =
+        offset.value > DELETE_WIDTH / 2 || e.velocityX < OPEN_VELOCITY;
+      if (shouldOpen) {
+        runOnJS(haptic)('selection');
+        offset.value = withSpring(DELETE_WIDTH, SPRING);
+      } else {
+        offset.value = withSpring(0, SPRING);
+      }
+    });
+
+  const panelStyle = useAnimatedStyle(() => ({
+    width: offset.value,
+  }));
+
+  const contentOpacity = useAnimatedStyle(() => {
+    const progress = Math.min(1, offset.value / DELETE_WIDTH);
+    return {
+      opacity: interpolate(
+        progress,
+        [0, 0.4, 1],
+        [0, 0, 1],
+        Extrapolation.CLAMP,
+      ),
+    };
   });
 
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [styles.action, pressed && { opacity: 0.85 }]}
-      accessibilityRole="button"
-      accessibilityLabel="Delete"
-    >
-      <Animated.View style={[styles.actionInner, { transform: [{ scale }] }]}>
-        <Trash2 size={20} color="#fff" strokeWidth={2.2} />
-        <Text style={styles.actionLabel}>Delete</Text>
-      </Animated.View>
-    </Pressable>
+    <GestureDetector gesture={pan}>
+      <View style={styles.outer}>
+        <View style={styles.childWrap}>{children}</View>
+        <Reanimated.View style={[styles.panel, panelStyle]}>
+          <View style={styles.panelInner}>
+            <Pressable
+              onPress={fire}
+              style={styles.panelPress}
+              accessibilityRole="button"
+              accessibilityLabel="Delete"
+            >
+              <Reanimated.View
+                style={[styles.panelContent, contentOpacity]}
+                pointerEvents="none"
+              >
+                <Trash2 size={20} color="#fff" strokeWidth={2.2} />
+                <Text style={styles.panelLabel} numberOfLines={1}>
+                  Delete
+                </Text>
+              </Reanimated.View>
+            </Pressable>
+          </View>
+        </Reanimated.View>
+      </View>
+    </GestureDetector>
   );
 }
 
 function makeStyles(theme: ReturnType<typeof useTheme>) {
   return StyleSheet.create({
-    action: {
-      width: 92,
-      justifyContent: 'center',
-      alignItems: 'center',
+    outer: {
+      flexDirection: 'row',
+      alignItems: 'stretch',
+      overflow: 'hidden',
+    },
+    childWrap: {
+      flex: 1,
+    },
+    panel: {
       backgroundColor: theme.colors.chipNegOn,
       borderRadius: radii.md,
-      marginRight: spacing.sm,
+      overflow: 'hidden',
+      // alignSelf:'stretch' makes the panel match the row's height (which
+      // is set by the child wrap). Critically, the panel itself contributes
+      // ZERO intrinsic height because panelInner is absolutely positioned
+      // below — so the row height stays equal to the children's natural
+      // height in both closed and open states.
+      alignSelf: 'stretch',
     },
-    actionInner: {
+    panelInner: {
+      // Absolute so the icon + label content never feed into the panel's
+      // intrinsic height. The panel is a 0-height box visually stretched
+      // to the row height; the inner paints into it but doesn't size it.
+      position: 'absolute',
+      top: 0,
+      bottom: 0,
+      left: 0,
+      width: DELETE_WIDTH,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    panelPress: {
+      flex: 1,
+      width: '100%',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    panelContent: {
       alignItems: 'center',
       gap: spacing.xs,
     },
-    actionLabel: {
+    panelLabel: {
       ...typography.bodySm,
       color: '#fff',
       fontFamily: typography.button.fontFamily,
